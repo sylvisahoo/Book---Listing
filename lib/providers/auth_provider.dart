@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 
 class AuthProvider extends ChangeNotifier {
-  final AuthService _authService = AuthService();
+  final AuthService _authService;
 
   bool _isLoading = false;
   bool _isAuthenticated = false;
@@ -14,7 +14,7 @@ class AuthProvider extends ChangeNotifier {
   Map<String, dynamic>? get currentUser => _currentUser;
   String? get errorMessage => _errorMessage;
 
-  AuthProvider() {
+  AuthProvider({AuthService? authService}) : _authService = authService ?? AuthService() {
     checkAuthStatus();
   }
 

@@ -13,6 +13,22 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Logging middleware
+app.use((req, res, next) => {
+  console.log(`\n--- [${new Date().toISOString()}] ${req.method} ${req.url} ---`);
+  console.log('Headers:', JSON.stringify(req.headers));
+  console.log('Body:', JSON.stringify(req.body));
+  
+  const originalSend = res.send;
+  res.send = function (body) {
+    console.log(`--- Response Status: ${res.statusCode} ---`);
+    console.log('Response Body:', body);
+    return originalSend.apply(res, arguments);
+  };
+  
+  next();
+});
+
 // Serve uploads folder statically
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 

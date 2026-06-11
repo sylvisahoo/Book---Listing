@@ -1,4 +1,5 @@
 const db = require('../db');
+const { mapDatabaseError } = require('../utils/errorHandler');
 
 // Helper to calculate progress and status for a goal
 async function getGoalProgress(userId, year, targetBooks) {
@@ -78,7 +79,15 @@ exports.createGoal = async (req, res) => {
       }
     });
   } catch (error) {
-    return res.status(500).json({ error: 'Internal Server Error' });
+    console.error('Error in createGoal:', error);
+    if (error.code === '23505') {
+      return res.status(400).json({ error: 'Goal already exists for this year' });
+    }
+    if (error.code === '23514') {
+      return res.status(400).json({ error: 'Goal value must be greater than zero' });
+    }
+    const mapped = mapDatabaseError(error, 'Reading goal creation failed. Please try again.');
+    return res.status(mapped.status).json({ error: mapped.error });
   }
 };
 
@@ -105,7 +114,9 @@ exports.getGoals = async (req, res) => {
 
     return res.status(200).json({ goals: goalsWithProgress });
   } catch (error) {
-    return res.status(500).json({ error: 'Internal Server Error' });
+    console.error('Error in getGoals:', error);
+    const mapped = mapDatabaseError(error, 'Failed to retrieve goals.');
+    return res.status(mapped.status).json({ error: mapped.error });
   }
 };
 
@@ -157,7 +168,43 @@ exports.updateGoal = async (req, res) => {
       }
     });
   } catch (error) {
-    return res.status(500).json({ error: 'Internal Server Error' });
+    console.error('Error in updateGoal:', error);
+    if (error.code === '23514') {
+      return res.status(400).json({ error: 'Goal value must be greater than zero' });
+    }
+    const mapped = mapDatabaseError(error, 'Failed to update goal.');
+    return res.status(mapped.status).json({ error: mapped.error });
+  }
+};
+
+exports.deleteGoal = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { id } = req.params;
+
+    const goalResult = await db.query(
+      'SELECT * FROM goals WHERE id = $1',
+      [id]
+    );
+
+    if (goalResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Goal not found' });
+    }
+
+    const goal = goalResult.rows[0];
+    if (goal.user_id !== userId) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+
+    await db.query('DELETE FROM goals WHERE id = $1', [id]);
+
+    return res.status(200).json({
+      message: 'Goal deleted successfully'
+    });
+  } catch (error) {
+    console.error('Error in deleteGoal:', error);
+    const mapped = mapDatabaseError(error, 'Failed to delete goal.');
+    return res.status(mapped.status).json({ error: mapped.error });
   }
 };
 

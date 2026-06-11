@@ -3,7 +3,7 @@ import '../models/book.dart';
 import '../services/book_service.dart';
 
 class BookProvider extends ChangeNotifier {
-  final BookService _bookService = BookService();
+  final BookService _bookService;
 
   List<Book> _books = [];
   bool _isLoading = false;
@@ -13,6 +13,8 @@ class BookProvider extends ChangeNotifier {
   bool _isDashboardLoading = false;
   List<dynamic> _goals = [];
   bool _isGoalsLoading = false;
+
+  BookProvider({BookService? bookService}) : _bookService = bookService ?? BookService();
 
   // Search/Filters/Sort
   String _searchText = '';

@@ -274,4 +274,59 @@ describe('Reading Goals Module APIs', () => {
       expect(res.body).toHaveProperty('error', 'Access denied');
     });
   });
+
+  describe('DELETE /api/goals/:id (Delete Goal)', () => {
+    it('should delete own goal successfully', async () => {
+      const createRes = await request(app)
+        .post('/api/goals')
+        .set('Authorization', `Bearer ${userToken1}`)
+        .send({
+          year: 2026,
+          target_books: 10
+        });
+
+      const goalId = createRes.body.goal.id;
+
+      const res = await request(app)
+        .delete(`/api/goals/${goalId}`)
+        .set('Authorization', `Bearer ${userToken1}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveProperty('message', 'Goal deleted successfully');
+
+      // Verify it is gone
+      const checkRes = await request(app)
+        .get('/api/goals')
+        .set('Authorization', `Bearer ${userToken1}`);
+      expect(checkRes.body.goals.length).toBe(0);
+    });
+
+    it('should prevent deleting another user\'s goal', async () => {
+      const createRes = await request(app)
+        .post('/api/goals')
+        .set('Authorization', `Bearer ${userToken2}`)
+        .send({
+          year: 2026,
+          target_books: 10
+        });
+
+      const goalId = createRes.body.goal.id;
+
+      const res = await request(app)
+        .delete(`/api/goals/${goalId}`)
+        .set('Authorization', `Bearer ${userToken1}`);
+
+      expect(res.status).toBe(403);
+      expect(res.body).toHaveProperty('error', 'Access denied');
+    });
+
+    it('should return 404 for non-existent goal', async () => {
+      const res = await request(app)
+        .delete('/api/goals/99999')
+        .set('Authorization', `Bearer ${userToken1}`);
+
+      expect(res.status).toBe(404);
+      expect(res.body).toHaveProperty('error', 'Goal not found');
+    });
+  });
 });

@@ -1,6 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 const db = require('../db');
+const { mapDatabaseError } = require('../utils/errorHandler');
 
 exports.addBook = async (req, res) => {
   try {
@@ -101,10 +102,12 @@ exports.addBook = async (req, res) => {
       book: result.rows[0]
     });
   } catch (error) {
+    console.error('Error in addBook:', error);
     if (req.file) {
       try { fs.unlinkSync(req.file.path); } catch (e) {}
     }
-    return res.status(500).json({ error: 'Internal Server Error' });
+    const mapped = mapDatabaseError(error, 'Book creation failed. Please try again.');
+    return res.status(mapped.status).json({ error: mapped.error });
   }
 };
 
@@ -197,7 +200,9 @@ exports.getBooks = async (req, res) => {
       }
     });
   } catch (error) {
-    return res.status(500).json({ error: 'Internal Server Error' });
+    console.error('Error in getBooks:', error);
+    const mapped = mapDatabaseError(error, 'Failed to retrieve books.');
+    return res.status(mapped.status).json({ error: mapped.error });
   }
 };
 
@@ -218,7 +223,9 @@ exports.getBookById = async (req, res) => {
 
     return res.status(200).json({ book });
   } catch (error) {
-    return res.status(500).json({ error: 'Internal Server Error' });
+    console.error('Error in getBookById:', error);
+    const mapped = mapDatabaseError(error, 'Failed to retrieve book details.');
+    return res.status(mapped.status).json({ error: mapped.error });
   }
 };
 
@@ -352,10 +359,12 @@ exports.editBook = async (req, res) => {
       book: result.rows[0]
     });
   } catch (error) {
+    console.error('Error in editBook:', error);
     if (req.file) {
       try { fs.unlinkSync(req.file.path); } catch (e) {}
     }
-    return res.status(500).json({ error: 'Internal Server Error' });
+    const mapped = mapDatabaseError(error, 'Failed to update book.');
+    return res.status(mapped.status).json({ error: mapped.error });
   }
 };
 
@@ -385,7 +394,9 @@ exports.deleteBook = async (req, res) => {
 
     return res.status(200).json({ message: 'Book deleted successfully' });
   } catch (error) {
-    return res.status(500).json({ error: 'Internal Server Error' });
+    console.error('Error in deleteBook:', error);
+    const mapped = mapDatabaseError(error, 'Failed to delete book.');
+    return res.status(mapped.status).json({ error: mapped.error });
   }
 };
 
@@ -424,7 +435,9 @@ exports.updateBookShelf = async (req, res) => {
       book: result.rows[0]
     });
   } catch (error) {
-    return res.status(500).json({ error: 'Internal Server Error' });
+    console.error('Error in updateBookShelf:', error);
+    const mapped = mapDatabaseError(error, 'Failed to update book shelf.');
+    return res.status(mapped.status).json({ error: mapped.error });
   }
 };
 
@@ -449,7 +462,9 @@ exports.getShelfStats = async (req, res) => {
       finishedReading: parseInt(stats.finishedReading, 10)
     });
   } catch (error) {
-    return res.status(500).json({ error: 'Internal Server Error' });
+    console.error('Error in getShelfStats:', error);
+    const mapped = mapDatabaseError(error, 'Failed to retrieve shelf statistics.');
+    return res.status(mapped.status).json({ error: mapped.error });
   }
 };
 
@@ -506,10 +521,12 @@ exports.updateProgress = async (req, res) => {
       progress_percentage
     });
   } catch (error) {
+    console.error('Error in updateProgress:', error);
     if (error && error.status) {
       return res.status(error.status).json({ error: error.error });
     }
-    return res.status(500).json({ error: 'Internal Server Error' });
+    const mapped = mapDatabaseError(error, 'Failed to update reading progress.');
+    return res.status(mapped.status).json({ error: mapped.error });
   }
 };
 
@@ -562,9 +579,11 @@ exports.addReview = async (req, res) => {
       book: resultData
     });
   } catch (error) {
+    console.error('Error in addReview:', error);
     if (error && error.status) {
       return res.status(error.status).json({ error: error.error });
     }
-    return res.status(500).json({ error: 'Internal Server Error' });
+    const mapped = mapDatabaseError(error, 'Failed to submit review.');
+    return res.status(mapped.status).json({ error: mapped.error });
   }
 };

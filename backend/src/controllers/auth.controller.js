@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const db = require('../db');
+const { seedUserBooks } = require('../utils/userSeeder');
 
 exports.register = async (req, res) => {
   try {
@@ -34,6 +35,13 @@ exports.register = async (req, res) => {
     );
 
     const newUser = result.rows[0];
+
+    // Seed default books automatically for the newly registered user
+    try {
+      await seedUserBooks(newUser.id);
+    } catch (seedingError) {
+      console.error('Failed to seed default books for new user:', seedingError);
+    }
 
     const token = jwt.sign(
       { id: newUser.id, email: newUser.email },

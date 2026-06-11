@@ -16,6 +16,13 @@ module.exports = async (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    
+    // Check if user still exists in the database
+    const userCheck = await db.query('SELECT id FROM users WHERE id = $1', [decoded.id]);
+    if (userCheck.rows.length === 0) {
+      return res.status(401).json({ error: 'User account not found. Please sign in again.' });
+    }
+
     req.user = decoded;
     req.token = token;
     next();
