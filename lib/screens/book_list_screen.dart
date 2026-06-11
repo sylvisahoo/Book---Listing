@@ -504,7 +504,7 @@ class _BookListScreenState extends State<BookListScreen> {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: _getShelfColor(book.shelf).withOpacity(0.15),
+                          color: _getShelfColor(book.shelf).withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
