@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:provider/provider.dart';
-import 'package:book_collection/providers/book_provider.dart';
-import 'package:book_collection/services/book_service.dart';
-import 'package:book_collection/models/book.dart';
-import 'package:book_collection/screens/book_detail_screen.dart';
+import 'package:book_collection/features/books/domain/entities/book.dart';
+import 'package:book_collection/features/books/domain/repositories/book_repository.dart';
+import 'package:book_collection/features/books/presentation/providers/book_provider.dart';
+import 'package:book_collection/features/books/presentation/screens/book_detail_screen.dart';
 
-class MockBookService extends Fake implements BookService {
+class MockBookRepository extends Fake implements BookRepository {
   bool getBookCalled = false;
   bool addReviewCalled = false;
   
@@ -82,18 +82,18 @@ class MockBookService extends Fake implements BookService {
 }
 
 void main() {
-  late MockBookService mockBookService;
-  late BookProvider bookProvider;
+  late MockBookRepository mockBookRepository;
 
   setUp(() {
     SharedPreferences.setMockInitialValues({});
-    mockBookService = MockBookService();
-    bookProvider = BookProvider(bookService: mockBookService);
+    mockBookRepository = MockBookRepository();
   });
 
   Widget buildTestableWidget() {
-    return ChangeNotifierProvider<BookProvider>.value(
-      value: bookProvider,
+    return ProviderScope(
+      overrides: [
+        bookRepositoryProvider.overrideWithValue(mockBookRepository),
+      ],
       child: MaterialApp(
         home: Builder(
           builder: (context) {
@@ -106,7 +106,7 @@ void main() {
           },
         ),
         routes: {
-          '/book-detail': (context) => BookDetailScreen(bookProvider: bookProvider),
+          '/book-detail': (context) => const BookDetailScreen(),
         },
       ),
     );
@@ -119,7 +119,7 @@ void main() {
       await tester.tap(find.text('Go to details'));
       await tester.pumpAndSettle();
 
-      expect(mockBookService.getBookCalled, isTrue);
+      expect(mockBookRepository.getBookCalled, isTrue);
       expect(find.text('The Great Gatsby'), findsOneWidget);
       expect(find.text('Your Rating & Review'), findsOneWidget);
       expect(find.text('Completed: 2026-06-01'), findsOneWidget);
@@ -127,7 +127,7 @@ void main() {
     });
 
     testWidgets('shows alternative text when review is empty or null', (WidgetTester tester) async {
-      mockBookService.mockBook = Book(
+      mockBookRepository.mockBook = Book(
         id: 101,
         userId: 1,
         title: 'The Great Gatsby',
@@ -196,7 +196,7 @@ void main() {
       await tester.tap(find.text('Save'));
       await tester.pumpAndSettle();
 
-      expect(mockBookService.addReviewCalled, isTrue);
+      expect(mockBookRepository.addReviewCalled, isTrue);
     });
   });
 }

@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:provider/provider.dart';
-import 'package:book_collection/providers/auth_provider.dart';
-import 'package:book_collection/services/auth_service.dart';
-import 'package:book_collection/screens/login_screen.dart';
-import 'package:book_collection/screens/register_screen.dart';
-import 'package:book_collection/screens/reset_request_screen.dart';
-import 'package:book_collection/screens/reset_password_screen.dart';
+import 'package:book_collection/features/auth/domain/entities/user_entity.dart';
+import 'package:book_collection/features/auth/domain/repositories/auth_repository.dart';
+import 'package:book_collection/features/auth/presentation/providers/auth_provider.dart';
+import 'package:book_collection/features/auth/presentation/screens/login_screen.dart';
+import 'package:book_collection/features/auth/presentation/screens/register_screen.dart';
+import 'package:book_collection/features/auth/presentation/screens/reset_request_screen.dart';
+import 'package:book_collection/features/auth/presentation/screens/reset_password_screen.dart';
 
-class MockAuthService extends Fake implements AuthService {
+class MockAuthRepository extends Fake implements AuthRepository {
   bool registerCalled = false;
   bool loginCalled = false;
   bool logoutCalled = false;
@@ -18,14 +19,14 @@ class MockAuthService extends Fake implements AuthService {
   bool clearSessionCalled = false;
 
   String? mockToken = 'mock_jwt_token';
-  Map<String, dynamic>? mockUser = {
-    'id': 1,
-    'name': 'Test User',
-    'email': 'test@example.com',
-  };
+  UserEntity? mockUser = const UserEntity(
+    id: 1,
+    name: 'Test User',
+    email: 'test@example.com',
+  );
 
   String? tokenToReturn;
-  Map<String, dynamic>? userToReturn;
+  UserEntity? userToReturn;
 
   bool shouldThrowError = false;
   String errorMessage = 'Error occurred';
@@ -34,7 +35,7 @@ class MockAuthService extends Fake implements AuthService {
   Future<String?> getToken() async => tokenToReturn;
 
   @override
-  Future<Map<String, dynamic>?> getUser() async => userToReturn;
+  Future<UserEntity?> getUser() async => userToReturn;
 
   @override
   Future<void> clearSession() async {
@@ -44,7 +45,7 @@ class MockAuthService extends Fake implements AuthService {
   }
 
   @override
-  Future<Map<String, dynamic>> register(
+  Future<UserEntity> register(
     String name,
     String email,
     String password,
@@ -56,18 +57,18 @@ class MockAuthService extends Fake implements AuthService {
     }
     tokenToReturn = mockToken;
     userToReturn = mockUser;
-    return {'token': mockToken!, 'user': mockUser!};
+    return mockUser!;
   }
 
   @override
-  Future<Map<String, dynamic>> login(String email, String password) async {
+  Future<UserEntity> login(String email, String password) async {
     loginCalled = true;
     if (shouldThrowError) {
       throw Exception(errorMessage);
     }
     tokenToReturn = mockToken;
     userToReturn = mockUser;
-    return {'token': mockToken!, 'user': mockUser!};
+    return mockUser!;
   }
 
   @override
@@ -102,24 +103,24 @@ class MockAuthService extends Fake implements AuthService {
 }
 
 void main() {
-  late MockAuthService mockAuthService;
-  late AuthProvider authProvider;
+  late MockAuthRepository mockAuthRepository;
 
   setUp(() {
     SharedPreferences.setMockInitialValues({});
-    mockAuthService = MockAuthService();
-    authProvider = AuthProvider(authService: mockAuthService);
+    mockAuthRepository = MockAuthRepository();
   });
 
   Widget buildTestableWidget(Widget screen) {
-    return ChangeNotifierProvider<AuthProvider>.value(
-      value: authProvider,
+    return ProviderScope(
+      overrides: [
+        authRepositoryProvider.overrideWithValue(mockAuthRepository),
+      ],
       child: MaterialApp(
         home: screen,
         routes: {
-          '/register': (context) => RegisterScreen(authProvider: authProvider),
-          '/reset-request': (context) => ResetRequestScreen(authProvider: authProvider),
-          '/reset-password': (context) => ResetPasswordScreen(authProvider: authProvider),
+          '/register': (context) => const RegisterScreen(),
+          '/reset-request': (context) => const ResetRequestScreen(),
+          '/reset-password': (context) => const ResetPasswordScreen(),
         },
       ),
     );
@@ -127,7 +128,7 @@ void main() {
 
   group('LoginScreen Widget Tests', () {
     testWidgets('displays login fields and title', (WidgetTester tester) async {
-      await tester.pumpWidget(buildTestableWidget(LoginScreen(authProvider: authProvider)));
+      await tester.pumpWidget(buildTestableWidget(const LoginScreen()));
       await tester.pump();
 
       expect(find.text('Sign In'), findsAtLeastNWidgets(2)); // Title and Button text
@@ -136,7 +137,7 @@ void main() {
     });
 
     testWidgets('shows validation errors for empty fields', (WidgetTester tester) async {
-      await tester.pumpWidget(buildTestableWidget(LoginScreen(authProvider: authProvider)));
+      await tester.pumpWidget(buildTestableWidget(const LoginScreen()));
       await tester.pump();
 
       // Tap Sign In button without entering any values
@@ -149,7 +150,7 @@ void main() {
     });
 
     testWidgets('shows validation error for invalid email', (WidgetTester tester) async {
-      await tester.pumpWidget(buildTestableWidget(LoginScreen(authProvider: authProvider)));
+      await tester.pumpWidget(buildTestableWidget(const LoginScreen()));
       await tester.pump();
 
       // Enter invalid email and pass
@@ -164,7 +165,7 @@ void main() {
     });
 
     testWidgets('successful login navigates or triggers logic', (WidgetTester tester) async {
-      await tester.pumpWidget(buildTestableWidget(LoginScreen(authProvider: authProvider)));
+      await tester.pumpWidget(buildTestableWidget(const LoginScreen()));
       await tester.pump();
 
       await tester.enterText(find.widgetWithText(TextFormField, 'Email Address'), 'john@example.com');
@@ -174,14 +175,14 @@ void main() {
       await tester.tap(signInButton);
       await tester.pump();
 
-      expect(mockAuthService.loginCalled, isTrue);
+      expect(mockAuthRepository.loginCalled, isTrue);
     });
 
     testWidgets('failed login shows failure dialog', (WidgetTester tester) async {
-      mockAuthService.shouldThrowError = true;
-      mockAuthService.errorMessage = 'Invalid email or password';
+      mockAuthRepository.shouldThrowError = true;
+      mockAuthRepository.errorMessage = 'Invalid email or password';
 
-      await tester.pumpWidget(buildTestableWidget(LoginScreen(authProvider: authProvider)));
+      await tester.pumpWidget(buildTestableWidget(const LoginScreen()));
       await tester.pump();
 
       await tester.enterText(find.widgetWithText(TextFormField, 'Email Address'), 'john@example.com');
@@ -191,7 +192,7 @@ void main() {
       await tester.tap(signInButton);
       await tester.pumpAndSettle();
 
-      expect(mockAuthService.loginCalled, isTrue);
+      expect(mockAuthRepository.loginCalled, isTrue);
       expect(find.text('Login Failed'), findsOneWidget);
       expect(find.text('Invalid email or password'), findsOneWidget);
     });
@@ -199,7 +200,7 @@ void main() {
 
   group('RegisterScreen Widget Tests', () {
     testWidgets('shows validation errors for empty values', (WidgetTester tester) async {
-      await tester.pumpWidget(buildTestableWidget(RegisterScreen(authProvider: authProvider)));
+      await tester.pumpWidget(buildTestableWidget(const RegisterScreen()));
       await tester.pump();
 
       final signUpButton = find.byType(ElevatedButton);
@@ -212,7 +213,7 @@ void main() {
     });
 
     testWidgets('shows validation error for short password', (WidgetTester tester) async {
-      await tester.pumpWidget(buildTestableWidget(RegisterScreen(authProvider: authProvider)));
+      await tester.pumpWidget(buildTestableWidget(const RegisterScreen()));
       await tester.pump();
 
       await tester.enterText(find.widgetWithText(TextFormField, 'Full Name'), 'John Doe');
@@ -228,7 +229,7 @@ void main() {
     });
 
     testWidgets('shows validation error for mismatched passwords', (WidgetTester tester) async {
-      await tester.pumpWidget(buildTestableWidget(RegisterScreen(authProvider: authProvider)));
+      await tester.pumpWidget(buildTestableWidget(const RegisterScreen()));
       await tester.pump();
 
       await tester.enterText(find.widgetWithText(TextFormField, 'Full Name'), 'John Doe');
@@ -244,7 +245,7 @@ void main() {
     });
 
     testWidgets('successful registration triggers registration API', (WidgetTester tester) async {
-      await tester.pumpWidget(buildTestableWidget(RegisterScreen(authProvider: authProvider)));
+      await tester.pumpWidget(buildTestableWidget(const RegisterScreen()));
       await tester.pump();
 
       await tester.enterText(find.widgetWithText(TextFormField, 'Full Name'), 'John Doe');
@@ -256,14 +257,14 @@ void main() {
       await tester.tap(signUpButton);
       await tester.pump();
 
-      expect(mockAuthService.registerCalled, isTrue);
+      expect(mockAuthRepository.registerCalled, isTrue);
     });
   });
 
   group('ResetRequestScreen & ResetPasswordScreen Tests', () {
     testWidgets('Forgot password workflow and generated token dialog', (WidgetTester tester) async {
-      await tester.pumpWidget(buildTestableWidget(ResetRequestScreen(authProvider: authProvider)));
-      await tester.pump();
+      await tester.pumpWidget(buildTestableWidget(const ResetRequestScreen()));
+      await tester.pumpAndSettle();
 
       await tester.enterText(find.widgetWithText(TextFormField, 'Email Address'), 'john@example.com');
       
@@ -271,13 +272,13 @@ void main() {
       await tester.tap(requestButton);
       await tester.pumpAndSettle();
 
-      expect(mockAuthService.requestResetCalled, isTrue);
+      expect(mockAuthRepository.requestResetCalled, isTrue);
       expect(find.text('Reset Token Generated!'), findsOneWidget);
       expect(find.text('mock_reset_token'), findsOneWidget);
     });
 
     testWidgets('Reset Password with token updates password successfully', (WidgetTester tester) async {
-      await tester.pumpWidget(buildTestableWidget(ResetPasswordScreen(authProvider: authProvider)));
+      await tester.pumpWidget(buildTestableWidget(const ResetPasswordScreen()));
       await tester.pump();
 
       await tester.enterText(find.widgetWithText(TextFormField, 'Reset Token'), 'mock_reset_token');
@@ -288,7 +289,7 @@ void main() {
       await tester.tap(resetButton);
       await tester.pump();
 
-      expect(mockAuthService.resetPasswordCalled, isTrue);
+      expect(mockAuthRepository.resetPasswordCalled, isTrue);
     });
   });
 }

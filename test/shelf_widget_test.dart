@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:provider/provider.dart';
-import 'package:book_collection/providers/book_provider.dart';
-import 'package:book_collection/services/book_service.dart';
-import 'package:book_collection/models/book.dart';
-import 'package:book_collection/screens/book_list_screen.dart';
-import 'package:book_collection/screens/book_detail_screen.dart';
+import 'package:book_collection/features/books/domain/entities/book.dart';
+import 'package:book_collection/features/books/domain/repositories/book_repository.dart';
+import 'package:book_collection/features/books/presentation/providers/book_provider.dart';
+import 'package:book_collection/features/books/presentation/screens/book_list_screen.dart';
+import 'package:book_collection/features/books/presentation/screens/book_detail_screen.dart';
 
-class MockBookService extends Fake implements BookService {
+class MockBookRepository extends Fake implements BookRepository {
   bool getBooksCalled = false;
   bool getBookCalled = false;
   bool updateShelfCalled = false;
@@ -90,22 +90,22 @@ class MockBookService extends Fake implements BookService {
 }
 
 void main() {
-  late MockBookService mockBookService;
-  late BookProvider bookProvider;
+  late MockBookRepository mockBookRepository;
 
   setUp(() {
     SharedPreferences.setMockInitialValues({});
-    mockBookService = MockBookService();
-    bookProvider = BookProvider(bookService: mockBookService);
+    mockBookRepository = MockBookRepository();
   });
 
   Widget buildTestableWidget(Widget screen) {
-    return ChangeNotifierProvider<BookProvider>.value(
-      value: bookProvider,
+    return ProviderScope(
+      overrides: [
+        bookRepositoryProvider.overrideWithValue(mockBookRepository),
+      ],
       child: MaterialApp(
         home: screen,
         routes: {
-          '/book-detail': (context) => BookDetailScreen(bookProvider: bookProvider),
+          '/book-detail': (context) => const BookDetailScreen(),
         },
       ),
     );
@@ -113,12 +113,12 @@ void main() {
 
   group('BookListScreen Shelf Stats Header Tests', () {
     testWidgets('renders shelf statistics counts correctly', (WidgetTester tester) async {
-      await tester.pumpWidget(buildTestableWidget(BookListScreen(bookProvider: bookProvider)));
+      await tester.pumpWidget(buildTestableWidget(const BookListScreen()));
       await tester.pump(); // trigger initState post frame callbacks
       await tester.pump(); // wait for async calls to finish
 
-      expect(mockBookService.getShelfStatsCalled, isTrue);
-      expect(mockBookService.getBooksCalled, isTrue);
+      expect(mockBookRepository.getShelfStatsCalled, isTrue);
+      expect(mockBookRepository.getBooksCalled, isTrue);
 
       // Verify that shelf stats counts from mock shelf stats are displayed
       expect(find.text('3'), findsOneWidget); // Want to Read count
@@ -133,10 +133,11 @@ void main() {
 
   group('BookDetailScreen Shelf Interaction Tests', () {
     testWidgets('displays current shelf tag and tapping opens bottom sheet', (WidgetTester tester) async {
-      // Setup routing with argument for Book ID 101
       await tester.pumpWidget(
-        ChangeNotifierProvider<BookProvider>.value(
-          value: bookProvider,
+        ProviderScope(
+          overrides: [
+            bookRepositoryProvider.overrideWithValue(mockBookRepository),
+          ],
           child: MaterialApp(
             home: Builder(
               builder: (context) {
@@ -149,7 +150,7 @@ void main() {
               },
             ),
             routes: {
-              '/book-detail': (context) => BookDetailScreen(bookProvider: bookProvider),
+              '/book-detail': (context) => const BookDetailScreen(),
             },
           ),
         ),
@@ -159,7 +160,7 @@ void main() {
       await tester.tap(find.text('Go to details'));
       await tester.pumpAndSettle();
 
-      expect(mockBookService.getBookCalled, isTrue);
+      expect(mockBookRepository.getBookCalled, isTrue);
       expect(find.text('Design Patterns'), findsOneWidget);
       expect(find.text('Want To Read'), findsOneWidget); // current shelf display
 
@@ -175,8 +176,10 @@ void main() {
 
     testWidgets('moving to Currently Reading shelf updates status', (WidgetTester tester) async {
       await tester.pumpWidget(
-        ChangeNotifierProvider<BookProvider>.value(
-          value: bookProvider,
+        ProviderScope(
+          overrides: [
+            bookRepositoryProvider.overrideWithValue(mockBookRepository),
+          ],
           child: MaterialApp(
             home: Builder(
               builder: (context) {
@@ -189,7 +192,7 @@ void main() {
               },
             ),
             routes: {
-              '/book-detail': (context) => BookDetailScreen(bookProvider: bookProvider),
+              '/book-detail': (context) => const BookDetailScreen(),
             },
           ),
         ),
@@ -206,7 +209,7 @@ void main() {
       await tester.tap(find.text('Currently Reading'));
       await tester.pumpAndSettle();
 
-      expect(mockBookService.updateShelfCalled, isTrue);
+      expect(mockBookRepository.updateShelfCalled, isTrue);
     });
   });
 }

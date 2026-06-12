@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:provider/provider.dart';
-import 'package:book_collection/providers/book_provider.dart';
-import 'package:book_collection/services/book_service.dart';
-import 'package:book_collection/screens/reading_goals_screen.dart';
+import 'package:book_collection/features/books/domain/entities/book.dart';
+import 'package:book_collection/features/books/domain/repositories/book_repository.dart';
+import 'package:book_collection/features/books/presentation/providers/book_provider.dart';
+import 'package:book_collection/features/books/presentation/screens/reading_goals_screen.dart';
 
-class MockBookService extends Fake implements BookService {
+class MockBookRepository extends Fake implements BookRepository {
   bool getGoalsCalled = false;
   bool createGoalCalled = false;
   bool updateGoalCalled = false;
@@ -106,36 +107,41 @@ class MockBookService extends Fake implements BookService {
       }
     };
   }
+
+  @override
+  Future<Map<String, dynamic>> getDashboardStats() async {
+    return {};
+  }
 }
 
 void main() {
-  late MockBookService mockBookService;
-  late BookProvider bookProvider;
+  late MockBookRepository mockBookRepository;
 
   setUp(() {
     SharedPreferences.setMockInitialValues({});
-    mockBookService = MockBookService();
-    bookProvider = BookProvider(bookService: mockBookService);
+    mockBookRepository = MockBookRepository();
   });
 
   Widget buildTestableWidget() {
-    return ChangeNotifierProvider<BookProvider>.value(
-      value: bookProvider,
-      child: MaterialApp(
-        home: ReadingGoalsScreen(bookProvider: bookProvider),
+    return ProviderScope(
+      overrides: [
+        bookRepositoryProvider.overrideWithValue(mockBookRepository),
+      ],
+      child: const MaterialApp(
+        home: ReadingGoalsScreen(),
       ),
     );
   }
 
   group('ReadingGoalsScreen Widget Tests', () {
     testWidgets('renders empty state when goals list is empty', (WidgetTester tester) async {
-      mockBookService.mockGoals = [];
+      mockBookRepository.mockGoals = [];
 
       await tester.pumpWidget(buildTestableWidget());
       await tester.pump();
       await tester.pump();
 
-      expect(mockBookService.getGoalsCalled, isTrue);
+      expect(mockBookRepository.getGoalsCalled, isTrue);
       expect(find.text('No Goals Configured'), findsOneWidget);
       expect(find.text('Set Your First Goal'), findsOneWidget);
     });
@@ -145,7 +151,7 @@ void main() {
       await tester.pump();
       await tester.pump();
 
-      expect(mockBookService.getGoalsCalled, isTrue);
+      expect(mockBookRepository.getGoalsCalled, isTrue);
       expect(find.text('2026 Reading Goal'), findsOneWidget);
       expect(find.text('4 of 12 books completed'), findsOneWidget);
       expect(find.text('33%'), findsOneWidget);
@@ -158,7 +164,7 @@ void main() {
     });
 
     testWidgets('validates form fields during goal creation', (WidgetTester tester) async {
-      mockBookService.mockGoals = [];
+      mockBookRepository.mockGoals = [];
 
       await tester.pumpWidget(buildTestableWidget());
       await tester.pump();
@@ -190,7 +196,7 @@ void main() {
     });
 
     testWidgets('creates a reading goal successfully', (WidgetTester tester) async {
-      mockBookService.mockGoals = [];
+      mockBookRepository.mockGoals = [];
 
       await tester.pumpWidget(buildTestableWidget());
       await tester.pump();
@@ -206,7 +212,7 @@ void main() {
       await tester.tap(find.text('Save'));
       await tester.pumpAndSettle();
 
-      expect(mockBookService.createGoalCalled, isTrue);
+      expect(mockBookRepository.createGoalCalled, isTrue);
       expect(find.text('Goal created successfully'), findsOneWidget);
     });
 
@@ -228,7 +234,7 @@ void main() {
       await tester.tap(find.text('Save'));
       await tester.pumpAndSettle();
 
-      expect(mockBookService.updateGoalCalled, isTrue);
+      expect(mockBookRepository.updateGoalCalled, isTrue);
       expect(find.text('Goal updated successfully'), findsOneWidget);
     });
   });

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:provider/provider.dart';
-import 'package:book_collection/providers/book_provider.dart';
-import 'package:book_collection/services/book_service.dart';
-import 'package:book_collection/models/book.dart';
-import 'package:book_collection/screens/book_list_screen.dart';
-import 'package:book_collection/screens/add_edit_book_screen.dart';
+import 'package:book_collection/features/books/domain/entities/book.dart';
+import 'package:book_collection/features/books/domain/repositories/book_repository.dart';
+import 'package:book_collection/features/books/presentation/providers/book_provider.dart';
+import 'package:book_collection/features/books/presentation/screens/book_list_screen.dart';
+import 'package:book_collection/features/books/presentation/screens/add_edit_book_screen.dart';
 
-class MockBookService extends Fake implements BookService {
+class MockBookRepository extends Fake implements BookRepository {
   bool getBooksCalled = false;
   bool addBookCalled = false;
   bool shouldThrowError = false;
@@ -77,21 +77,26 @@ class MockBookService extends Fake implements BookService {
   Future<Map<String, int>> getShelfStats() async {
     return {'wantToRead': 0, 'currentlyReading': 0, 'finishedReading': 0};
   }
+
+  @override
+  Future<Map<String, dynamic>> getDashboardStats() async {
+    return {};
+  }
 }
 
 void main() {
-  late MockBookService mockBookService;
-  late BookProvider bookProvider;
+  late MockBookRepository mockBookRepository;
 
   setUp(() {
     SharedPreferences.setMockInitialValues({});
-    mockBookService = MockBookService();
-    bookProvider = BookProvider(bookService: mockBookService);
+    mockBookRepository = MockBookRepository();
   });
 
   Widget buildTestableWidget(Widget screen) {
-    return ChangeNotifierProvider<BookProvider>.value(
-      value: bookProvider,
+    return ProviderScope(
+      overrides: [
+        bookRepositoryProvider.overrideWithValue(mockBookRepository),
+      ],
       child: MaterialApp(
         home: screen,
       ),
@@ -107,11 +112,11 @@ void main() {
         tester.view.resetDevicePixelRatio();
       });
 
-      await tester.pumpWidget(buildTestableWidget(BookListScreen(bookProvider: bookProvider)));
+      await tester.pumpWidget(buildTestableWidget(const BookListScreen()));
       await tester.pump();
       await tester.pump();
 
-      expect(mockBookService.getBooksCalled, isTrue);
+      expect(mockBookRepository.getBooksCalled, isTrue);
       // Defaults to page 1 of 3
       expect(find.text('Page 1 of 3'), findsOneWidget);
 
@@ -121,10 +126,13 @@ void main() {
       await tester.tap(nextButton);
       await tester.pumpAndSettle();
 
-      expect(mockBookService.requestedPage, toBe(2));
+      expect(mockBookRepository.requestedPage, toBe(2));
 
       // Now page should be 2. Let's manually set page to 2 and rebuild to ensure previous button works
-      bookProvider.setPage(2);
+      final element = tester.element(find.byType(BookListScreen));
+      final container = ProviderScope.containerOf(element);
+      container.read(bookNotifierProvider.notifier).setPage(2);
+      
       await tester.pumpAndSettle();
       expect(find.text('Page 2 of 3'), findsOneWidget);
 
@@ -134,7 +142,7 @@ void main() {
       await tester.tap(prevButton);
       await tester.pumpAndSettle();
 
-      expect(mockBookService.requestedPage, toBe(1));
+      expect(mockBookRepository.requestedPage, toBe(1));
     });
   });
 
@@ -147,10 +155,10 @@ void main() {
         tester.view.resetDevicePixelRatio();
       });
 
-      mockBookService.shouldThrowError = true;
-      mockBookService.errorMessage = '23503: Foreign key violation';
+      mockBookRepository.shouldThrowError = true;
+      mockBookRepository.errorMessage = '23503: Foreign key violation';
 
-      await tester.pumpWidget(buildTestableWidget(AddEditBookScreen(bookProvider: bookProvider)));
+      await tester.pumpWidget(buildTestableWidget(const AddEditBookScreen()));
       await tester.pump();
 
       // Enter valid fields
@@ -163,7 +171,7 @@ void main() {
       await tester.tap(find.text('Save Book'));
       await tester.pumpAndSettle();
 
-      expect(mockBookService.addBookCalled, isTrue);
+      expect(mockBookRepository.addBookCalled, isTrue);
 
       // Verify that error alert dialog appears with the exception message
       expect(find.text('Error'), findsOneWidget);
@@ -173,5 +181,4 @@ void main() {
   });
 }
 
-// Chevron chevron helpers mapping for chevron icon widgets
 Matcher toBe(int expected) => equals(expected);

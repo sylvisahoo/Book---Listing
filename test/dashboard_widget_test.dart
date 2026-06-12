@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:provider/provider.dart';
-import 'package:book_collection/providers/book_provider.dart';
-import 'package:book_collection/services/book_service.dart';
-import 'package:book_collection/screens/stats_dashboard_screen.dart';
+import 'package:book_collection/features/books/domain/entities/book.dart';
+import 'package:book_collection/features/books/domain/repositories/book_repository.dart';
+import 'package:book_collection/features/books/presentation/providers/book_provider.dart';
+import 'package:book_collection/features/books/presentation/screens/stats_dashboard_screen.dart';
 
-class MockBookService extends Fake implements BookService {
+class MockBookRepository extends Fake implements BookRepository {
   bool getDashboardStatsCalled = false;
   bool shouldThrowError = false;
 
@@ -82,45 +83,40 @@ class MockBookService extends Fake implements BookService {
 }
 
 void main() {
-  late MockBookService mockBookService;
-  late BookProvider bookProvider;
+  late MockBookRepository mockBookRepository;
 
   setUp(() {
     SharedPreferences.setMockInitialValues({});
-    mockBookService = MockBookService();
-    bookProvider = BookProvider(bookService: mockBookService);
+    mockBookRepository = MockBookRepository();
   });
 
   Widget buildTestableWidget() {
-    return ChangeNotifierProvider<BookProvider>.value(
-      value: bookProvider,
-      child: MaterialApp(
-        home: StatsDashboardScreen(bookProvider: bookProvider),
+    return ProviderScope(
+      overrides: [
+        bookRepositoryProvider.overrideWithValue(mockBookRepository),
+      ],
+      child: const MaterialApp(
+        home: StatsDashboardScreen(),
       ),
     );
   }
 
   group('StatsDashboardScreen Widget Tests', () {
     testWidgets('shows loading spinner when stats are loading and cache is null', (WidgetTester tester) async {
-      // Set state to loading but keep stats null to trigger circular progress indicator
       await tester.pumpWidget(buildTestableWidget());
-      
-      // The screen automatically triggers fetchDashboardStats in initState's post frame callback.
-      // So let's pump once to trigger init.
       await tester.pump();
 
-      // Expect to see the loader
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
 
     testWidgets('shows retry error screen when fetching fails', (WidgetTester tester) async {
-      mockBookService.shouldThrowError = true;
+      mockBookRepository.shouldThrowError = true;
 
       await tester.pumpWidget(buildTestableWidget());
       await tester.pump(); // trigger initState callback
       await tester.pump(); // wait for fetchDashboardStats future to finish
 
-      expect(mockBookService.getDashboardStatsCalled, isTrue);
+      expect(mockBookRepository.getDashboardStatsCalled, isTrue);
       expect(find.text('No stats available'), findsOneWidget);
       expect(find.text('Retry'), findsOneWidget);
     });
@@ -130,7 +126,7 @@ void main() {
       await tester.pump(); // trigger initState callback
       await tester.pump(); // wait for fetchDashboardStats future to finish
 
-      expect(mockBookService.getDashboardStatsCalled, isTrue);
+      expect(mockBookRepository.getDashboardStatsCalled, isTrue);
 
       // 1. Summary Cards verification
       expect(find.text('Total Books'), findsOneWidget);
@@ -174,20 +170,20 @@ void main() {
     });
 
     testWidgets('clicking retry triggers a new fetch request', (WidgetTester tester) async {
-      mockBookService.shouldThrowError = true;
+      mockBookRepository.shouldThrowError = true;
 
       await tester.pumpWidget(buildTestableWidget());
       await tester.pump();
       await tester.pump();
 
-      expect(mockBookService.getDashboardStatsCalled, isTrue);
-      mockBookService.getDashboardStatsCalled = false; // Reset checker
+      expect(mockBookRepository.getDashboardStatsCalled, isTrue);
+      mockBookRepository.getDashboardStatsCalled = false; // Reset checker
 
       // Tap Retry button
       await tester.tap(find.text('Retry'));
       await tester.pump();
 
-      expect(mockBookService.getDashboardStatsCalled, isTrue);
+      expect(mockBookRepository.getDashboardStatsCalled, isTrue);
     });
   });
 }
