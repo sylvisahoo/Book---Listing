@@ -323,13 +323,13 @@ class _ReadingGoalsScreenState extends ConsumerState<ReadingGoalsScreen> {
                     borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFFE78FB3).withOpacity(0.06),
+                        color: const Color(0xFFE78FB3).withValues(alpha: 0.06),
                         blurRadius: 15,
                         offset: const Offset(0, 8),
                       ),
                     ],
                     border: Border.all(
-                      color: const Color(0xFFFFDCE8).withOpacity(0.5),
+                      color: const Color(0xFFFFDCE8).withValues(alpha: 0.5),
                     ),
                   ),
                   child: Column(
@@ -356,7 +356,7 @@ class _ReadingGoalsScreenState extends ConsumerState<ReadingGoalsScreen> {
                                 decoration: BoxDecoration(
                                   color: const Color(
                                     0xFFE78FB3,
-                                  ).withOpacity(0.15),
+                                  ).withValues(alpha: 0.15),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Text(
