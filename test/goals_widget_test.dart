@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:book_collection/features/books/domain/entities/book.dart';
 import 'package:book_collection/features/books/domain/repositories/book_repository.dart';
 import 'package:book_collection/features/books/presentation/providers/book_provider.dart';
 import 'package:book_collection/features/books/presentation/screens/reading_goals_screen.dart';

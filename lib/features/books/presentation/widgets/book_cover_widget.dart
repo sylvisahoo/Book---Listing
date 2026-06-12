@@ -86,7 +86,7 @@ class BookCoverWidget extends StatelessWidget {
           coverTheme = CoverArtTheme.literatureStars;
           category = 'CLASSIC LITERATURE';
           textColor = const Color(0xFF3A3142);
-          badgeBgColor = const Color(0xFFFFFFFF).withOpacity(0.4);
+          badgeBgColor = const Color(0xFFFFFFFF).withValues(alpha: 0.4);
           badgeTextColor = const Color(0xFF8B7E95);
           break;
         case 1:
@@ -110,7 +110,7 @@ class BookCoverWidget extends StatelessWidget {
           coverTheme = CoverArtTheme.classicScroll;
           category = 'HISTORY & CULTURE';
           textColor = const Color(0xFF3A3142);
-          badgeBgColor = const Color(0xFFFFFFFF).withOpacity(0.4);
+          badgeBgColor = const Color(0xFFFFFFFF).withValues(alpha: 0.4);
           badgeTextColor = const Color(0xFF8B7E95);
           break;
       }
@@ -130,7 +130,7 @@ class BookCoverWidget extends StatelessWidget {
           borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFE78FB3).withOpacity(0.08),
+              color: const Color(0xFFE78FB3).withValues(alpha: 0.08),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -152,10 +152,10 @@ class BookCoverWidget extends StatelessWidget {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      Colors.black.withOpacity(0.08),
-                      Colors.white.withOpacity(0.12),
-                      Colors.white.withOpacity(0.0),
-                      Colors.black.withOpacity(0.12),
+                      Colors.black.withValues(alpha: 0.08),
+                      Colors.white.withValues(alpha: 0.12),
+                      Colors.white.withValues(alpha: 0.0),
+                      Colors.black.withValues(alpha: 0.12),
                     ],
                     stops: const [0.0, 0.2, 0.45, 1.0],
                     begin: Alignment.centerLeft,
@@ -235,7 +235,7 @@ class BookCoverWidget extends StatelessWidget {
                             shadows: textColor == Colors.white
                                 ? [
                                     Shadow(
-                                      color: Colors.black.withOpacity(0.3),
+                                      color: Colors.black.withValues(alpha: 0.3),
                                       offset: const Offset(0, 1),
                                       blurRadius: 2,
                                     ),
@@ -252,7 +252,7 @@ class BookCoverWidget extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 9.5 * fontSizeMultiplier,
                             fontWeight: FontWeight.w500,
-                            color: textColor.withOpacity(0.8),
+                            color: textColor.withValues(alpha: 0.8),
                             fontStyle: FontStyle.italic,
                             fontFamily: 'Outfit',
                           ),
@@ -270,19 +270,19 @@ class BookCoverWidget extends StatelessWidget {
                       Container(
                         height: 1,
                         width: 16,
-                        color: textColor.withOpacity(0.3),
+                        color: textColor.withValues(alpha: 0.3),
                       ),
                       const SizedBox(width: 6),
                       Icon(
                         Icons.star_outline_rounded,
                         size: 10 * fontSizeMultiplier,
-                        color: textColor.withOpacity(0.4),
+                        color: textColor.withValues(alpha: 0.4),
                       ),
                       const SizedBox(width: 6),
                       Container(
                         height: 1,
                         width: 16,
-                        color: textColor.withOpacity(0.3),
+                        color: textColor.withValues(alpha: 0.3),
                       ),
                     ],
                   ),
@@ -313,7 +313,7 @@ class _BookmarkRibbonPainter extends CustomPainter {
     path.close();
     canvas.drawPath(path, paint);
 
-    final shadowPaint = Paint()..color = Colors.black.withOpacity(0.12);
+    final shadowPaint = Paint()..color = Colors.black.withValues(alpha: 0.12);
     canvas.drawRect(Rect.fromLTWH(0, 0, size.width, 3), shadowPaint);
   }
 
@@ -358,7 +358,7 @@ class _CoverArtPainter extends CustomPainter {
 
   void _paintEditorialBotanical(Canvas canvas, Size size) {
     final borderPaint = Paint()
-      ..color = const Color(0xFFE78FB3).withOpacity(0.2)
+      ..color = const Color(0xFFE78FB3).withValues(alpha: 0.2)
       ..strokeWidth = 1.0
       ..style = PaintingStyle.stroke;
 
@@ -372,7 +372,7 @@ class _CoverArtPainter extends CustomPainter {
     );
 
     final archPaint = Paint()
-      ..color = const Color(0xFFE78FB3).withOpacity(0.12)
+      ..color = const Color(0xFFE78FB3).withValues(alpha: 0.12)
       ..strokeWidth = 1.2
       ..style = PaintingStyle.stroke;
 
@@ -392,13 +392,13 @@ class _CoverArtPainter extends CustomPainter {
     canvas.drawPath(archPath, archPaint);
 
     final stemPaint = Paint()
-      ..color = const Color(0xFF3A3142).withOpacity(0.3)
+      ..color = const Color(0xFF3A3142).withValues(alpha: 0.3)
       ..strokeWidth = 1.2
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke;
 
     final leafPaint = Paint()
-      ..color = const Color(0xFFE78FB3).withOpacity(0.4)
+      ..color = const Color(0xFFE78FB3).withValues(alpha: 0.4)
       ..style = PaintingStyle.fill;
 
     _drawBranch(
@@ -412,11 +412,11 @@ class _CoverArtPainter extends CustomPainter {
 
   void _paintCelestialNight(Canvas canvas, Size size) {
     final goldPaint = Paint()
-      ..color = const Color(0xFFFFDCE8).withOpacity(0.65)
+      ..color = const Color(0xFFFFDCE8).withValues(alpha: 0.65)
       ..style = PaintingStyle.fill;
 
     final sparklePaint = Paint()
-      ..color = const Color(0xFFFFFFFF).withOpacity(0.8)
+      ..color = const Color(0xFFFFFFFF).withValues(alpha: 0.8)
       ..style = PaintingStyle.fill;
 
     final cx = size.width * 0.5;
@@ -440,7 +440,7 @@ class _CoverArtPainter extends CustomPainter {
 
   void _paintDreamyGrowth(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withOpacity(0.2)
+      ..color = Colors.white.withValues(alpha: 0.2)
       ..style = PaintingStyle.fill;
 
     for (int i = 1; i <= 3; i++) {
@@ -449,12 +449,12 @@ class _CoverArtPainter extends CustomPainter {
     }
 
     final linePaint = Paint()
-      ..color = const Color(0xFFFFFFFF).withOpacity(0.6)
+      ..color = const Color(0xFFFFFFFF).withValues(alpha: 0.6)
       ..strokeWidth = 1.2
       ..style = PaintingStyle.stroke;
 
     final goldPaint = Paint()
-      ..color = const Color(0xFFFFE0B2).withOpacity(0.8)
+      ..color = const Color(0xFFFFE0B2).withValues(alpha: 0.8)
       ..style = PaintingStyle.fill;
 
     canvas.drawLine(
@@ -473,16 +473,16 @@ class _CoverArtPainter extends CustomPainter {
 
   void _paintCreativeBlossoms(Canvas canvas, Size size) {
     final stemPaint = Paint()
-      ..color = const Color(0xFF3A3142).withOpacity(0.2)
+      ..color = const Color(0xFF3A3142).withValues(alpha: 0.2)
       ..strokeWidth = 1.0
       ..style = PaintingStyle.stroke;
 
     final flowerPaint = Paint()
-      ..color = const Color(0xFFE78FB3).withOpacity(0.55)
+      ..color = const Color(0xFFE78FB3).withValues(alpha: 0.55)
       ..style = PaintingStyle.fill;
 
     final goldLeafPaint = Paint()
-      ..color = const Color(0xFFFFDCE8).withOpacity(0.65)
+      ..color = const Color(0xFFFFDCE8).withValues(alpha: 0.65)
       ..style = PaintingStyle.fill;
 
     _drawBranch(
@@ -520,11 +520,11 @@ class _CoverArtPainter extends CustomPainter {
 
   void _paintLiteratureStars(Canvas canvas, Size size) {
     final bookPaint = Paint()
-      ..color = const Color(0xFFFFFFFF).withOpacity(0.2)
+      ..color = const Color(0xFFFFFFFF).withValues(alpha: 0.2)
       ..style = PaintingStyle.fill;
 
     final linePaint = Paint()
-      ..color = const Color(0xFFFFFFFF).withOpacity(0.4)
+      ..color = const Color(0xFFFFFFFF).withValues(alpha: 0.4)
       ..strokeWidth = 1.0
       ..style = PaintingStyle.stroke;
 
@@ -551,7 +551,7 @@ class _CoverArtPainter extends CustomPainter {
     canvas.drawPath(rightPage, linePaint);
 
     final sparklePaint = Paint()
-      ..color = const Color(0xFFFFDCE8).withOpacity(0.9)
+      ..color = const Color(0xFFFFDCE8).withValues(alpha: 0.9)
       ..style = PaintingStyle.fill;
 
     _drawSparkle(canvas, Offset(cx - 12, cy - 35), 6.0, sparklePaint);
@@ -561,7 +561,7 @@ class _CoverArtPainter extends CustomPainter {
 
   void _paintPhilosophyArch(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = const Color(0xFFFFFFFF).withOpacity(0.3)
+      ..color = const Color(0xFFFFFFFF).withValues(alpha: 0.3)
       ..strokeWidth = 1.2
       ..style = PaintingStyle.stroke;
 
@@ -581,7 +581,7 @@ class _CoverArtPainter extends CustomPainter {
     canvas.drawPath(archPath, paint);
 
     final goldPaint = Paint()
-      ..color = const Color(0xFFFFE0B2).withOpacity(0.6)
+      ..color = const Color(0xFFFFE0B2).withValues(alpha: 0.6)
       ..style = PaintingStyle.fill;
 
     final cx = size.width * 0.5;
@@ -601,11 +601,11 @@ class _CoverArtPainter extends CustomPainter {
 
   void _paintBloomSunburst(Canvas canvas, Size size) {
     final petalPaint = Paint()
-      ..color = const Color(0xFFE78FB3).withOpacity(0.12)
+      ..color = const Color(0xFFE78FB3).withValues(alpha: 0.12)
       ..style = PaintingStyle.fill;
 
     final centerPaint = Paint()
-      ..color = const Color(0xFFFFDCE8).withOpacity(0.8)
+      ..color = const Color(0xFFFFDCE8).withValues(alpha: 0.8)
       ..style = PaintingStyle.fill;
 
     final cx = size.width * 0.5;
@@ -622,7 +622,7 @@ class _CoverArtPainter extends CustomPainter {
     canvas.drawCircle(Offset(cx, cy), 8.0, centerPaint);
 
     final goldPaint = Paint()
-      ..color = const Color(0xFFFFE0B2).withOpacity(0.7)
+      ..color = const Color(0xFFFFE0B2).withValues(alpha: 0.7)
       ..style = PaintingStyle.fill;
     _drawSparkle(
       canvas,
@@ -640,7 +640,7 @@ class _CoverArtPainter extends CustomPainter {
 
   void _paintClassicScroll(Canvas canvas, Size size) {
     final borderPaint = Paint()
-      ..color = const Color(0xFFFFFFFF).withOpacity(0.35)
+      ..color = const Color(0xFFFFFFFF).withValues(alpha: 0.35)
       ..strokeWidth = 1.0
       ..style = PaintingStyle.stroke;
 
@@ -654,7 +654,7 @@ class _CoverArtPainter extends CustomPainter {
     );
 
     final leafPaint = Paint()
-      ..color = const Color(0xFFFFFFFF).withOpacity(0.3)
+      ..color = const Color(0xFFFFFFFF).withValues(alpha: 0.3)
       ..style = PaintingStyle.fill;
 
     canvas.drawCircle(const Offset(12, 12), 2.0, leafPaint);
