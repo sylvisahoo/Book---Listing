@@ -23,19 +23,19 @@ class _SakuraPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final branchPaint = Paint()
       ..color = const Color(0xFF6E5568)
-          .withOpacity(0.15) // Soft woody brown-purple
+          .withValues(alpha: 0.15) // Soft woody brown-purple
       ..strokeWidth = 3.0
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke;
 
     final petalPaintPrimary = Paint()
       ..color = const Color(0xFFF8BBD9)
-          .withOpacity(0.4) // Soft pink
+          .withValues(alpha: 0.4) // Soft pink
       ..style = PaintingStyle.fill;
 
     final petalPaintAccent = Paint()
       ..color = const Color(0xFFE78FB3)
-          .withOpacity(0.35) // Deep rose pink
+          .withValues(alpha: 0.35) // Deep rose pink
       ..style = PaintingStyle.fill;
 
     // 1. Draw a soft decorative branch in the top right corner

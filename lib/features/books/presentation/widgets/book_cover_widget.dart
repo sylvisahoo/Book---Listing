@@ -61,7 +61,7 @@ class BookCoverWidget extends StatelessWidget {
       coverTheme = CoverArtTheme.celestialNight;
       category = 'FINANCE & WEALTH';
       textColor = const Color(0xFFFFFFFF);
-      badgeBgColor = const Color(0xFFFFFFFF).withOpacity(0.2);
+      badgeBgColor = const Color(0xFFFFFFFF).withValues(alpha: 0.2);
       badgeTextColor = const Color(0xFFFFFFFF);
     } else if (normTitle.contains('good to great')) {
       gradientColors = [const Color(0xFFD6CDE6), const Color(0xFFF5D6DF)];
@@ -94,7 +94,7 @@ class BookCoverWidget extends StatelessWidget {
           coverTheme = CoverArtTheme.philosophyArch;
           category = 'PHILOSOPHY & MIND';
           textColor = const Color(0xFF3A3142);
-          badgeBgColor = const Color(0xFFFFFFFF).withOpacity(0.4);
+          badgeBgColor = const Color(0xFFFFFFFF).withValues(alpha: 0.4);
           badgeTextColor = const Color(0xFF8B7E95);
           break;
         case 2:
