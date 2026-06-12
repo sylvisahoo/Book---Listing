@@ -231,12 +231,12 @@ class _StatsDashboardScreenState extends ConsumerState<StatsDashboardScreen> {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFE78FB3).withOpacity(0.06),
+            color: const Color(0xFFE78FB3).withValues(alpha: 0.06),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
         ],
-        border: Border.all(color: const Color(0xFFFFDCE8).withOpacity(0.5)),
+        border: Border.all(color: const Color(0xFFFFDCE8).withValues(alpha: 0.5)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -281,12 +281,12 @@ class _StatsDashboardScreenState extends ConsumerState<StatsDashboardScreen> {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFE78FB3).withOpacity(0.06),
+            color: const Color(0xFFE78FB3).withValues(alpha: 0.06),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
         ],
-        border: Border.all(color: const Color(0xFFFFDCE8).withOpacity(0.5)),
+        border: Border.all(color: const Color(0xFFFFDCE8).withValues(alpha: 0.5)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -312,7 +312,7 @@ class _StatsDashboardScreenState extends ConsumerState<StatsDashboardScreen> {
               Container(
                 height: 32,
                 width: 1,
-                color: const Color(0xFFFFDCE8).withOpacity(0.5),
+                color: const Color(0xFFFFDCE8).withValues(alpha: 0.5),
               ),
               _buildInsightMetric(
                 label: 'This Month',
@@ -323,7 +323,7 @@ class _StatsDashboardScreenState extends ConsumerState<StatsDashboardScreen> {
               Container(
                 height: 32,
                 width: 1,
-                color: const Color(0xFFFFDCE8).withOpacity(0.5),
+                color: const Color(0xFFFFDCE8).withValues(alpha: 0.5),
               ),
               _buildInsightMetric(
                 label: 'This Year',
@@ -378,12 +378,12 @@ class _StatsDashboardScreenState extends ConsumerState<StatsDashboardScreen> {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFE78FB3).withOpacity(0.06),
+            color: const Color(0xFFE78FB3).withValues(alpha: 0.06),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
         ],
-        border: Border.all(color: const Color(0xFFFFDCE8).withOpacity(0.5)),
+        border: Border.all(color: const Color(0xFFFFDCE8).withValues(alpha: 0.5)),
       ),
       child: Column(
         children: [
@@ -433,12 +433,12 @@ class _StatsDashboardScreenState extends ConsumerState<StatsDashboardScreen> {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFE78FB3).withOpacity(0.06),
+            color: const Color(0xFFE78FB3).withValues(alpha: 0.06),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
         ],
-        border: Border.all(color: const Color(0xFFFFDCE8).withOpacity(0.5)),
+        border: Border.all(color: const Color(0xFFFFDCE8).withValues(alpha: 0.5)),
       ),
       child: Column(
         children: [
@@ -500,7 +500,7 @@ class _StatsDashboardScreenState extends ConsumerState<StatsDashboardScreen> {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFE78FB3).withOpacity(0.2),
+            color: const Color(0xFFE78FB3).withValues(alpha: 0.2),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
@@ -511,7 +511,7 @@ class _StatsDashboardScreenState extends ConsumerState<StatsDashboardScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFFFFFFFF).withOpacity(0.25),
+              color: const Color(0xFFFFFFFF).withValues(alpha: 0.25),
               shape: BoxShape.circle,
             ),
             child: const Icon(
@@ -528,7 +528,7 @@ class _StatsDashboardScreenState extends ConsumerState<StatsDashboardScreen> {
                 Text(
                   'Favorite Genre',
                   style: TextStyle(
-                    color: const Color(0xFF3A3142).withOpacity(0.7),
+                    color: const Color(0xFF3A3142).withValues(alpha: 0.7),
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                   ),
@@ -558,12 +558,12 @@ class _StatsDashboardScreenState extends ConsumerState<StatsDashboardScreen> {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFE78FB3).withOpacity(0.06),
+            color: const Color(0xFFE78FB3).withValues(alpha: 0.06),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
         ],
-        border: Border.all(color: const Color(0xFFFFDCE8).withOpacity(0.5)),
+        border: Border.all(color: const Color(0xFFFFDCE8).withValues(alpha: 0.5)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -640,12 +640,12 @@ class _StatsDashboardScreenState extends ConsumerState<StatsDashboardScreen> {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFE78FB3).withOpacity(0.06),
+            color: const Color(0xFFE78FB3).withValues(alpha: 0.06),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
         ],
-        border: Border.all(color: const Color(0xFFFFDCE8).withOpacity(0.5)),
+        border: Border.all(color: const Color(0xFFFFDCE8).withValues(alpha: 0.5)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -667,7 +667,7 @@ class _StatsDashboardScreenState extends ConsumerState<StatsDashboardScreen> {
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE78FB3).withOpacity(0.15),
+                  color: const Color(0xFFE78FB3).withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
