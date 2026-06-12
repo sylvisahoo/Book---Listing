@@ -467,12 +467,12 @@ class _BookListScreenState extends ConsumerState<BookListScreen> {
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFE78FB3).withOpacity(0.06),
+              color: const Color(0xFFE78FB3).withValues(alpha: 0.06),
               blurRadius: 15,
               offset: const Offset(0, 8),
             ),
           ],
-          border: Border.all(color: const Color(0xFFFFDCE8).withOpacity(0.4)),
+          border: Border.all(color: const Color(0xFFFFDCE8).withValues(alpha: 0.4)),
         ),
         clipBehavior: Clip.antiAlias,
         child: Column(
@@ -528,7 +528,7 @@ class _BookListScreenState extends ConsumerState<BookListScreen> {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: _getShelfColor(book.shelf).withOpacity(0.15),
+                          color: _getShelfColor(book.shelf).withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(

@@ -753,7 +753,7 @@ class _BookDetailScreenState extends ConsumerState<BookDetailScreen> {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.5),
+                        color: Colors.black.withValues(alpha: 0.5),
                         blurRadius: 15,
                         offset: const Offset(0, 10),
                       ),
@@ -824,12 +824,12 @@ class _BookDetailScreenState extends ConsumerState<BookDetailScreen> {
                             decoration: BoxDecoration(
                               color: _getShelfColor(
                                 book.shelf,
-                              ).withOpacity(0.15),
+                              ).withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
                                 color: _getShelfColor(
                                   book.shelf,
-                                ).withOpacity(0.3),
+                                ).withValues(alpha: 0.3),
                               ),
                             ),
                             child: Row(
