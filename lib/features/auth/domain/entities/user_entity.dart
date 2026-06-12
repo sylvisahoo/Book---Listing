@@ -3,11 +3,7 @@ class UserEntity {
   final String name;
   final String email;
 
-  const UserEntity({
-    required this.id,
-    required this.name,
-    required this.email,
-  });
+  const UserEntity({required this.id, required this.name, required this.email});
 
   factory UserEntity.fromJson(Map<String, dynamic> json) {
     return UserEntity(
@@ -18,10 +14,6 @@ class UserEntity {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'email': email,
-    };
+    return {'id': id, 'name': name, 'email': email};
   }
 }

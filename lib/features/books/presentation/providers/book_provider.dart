@@ -55,7 +55,9 @@ final updateBookShelfUseCaseProvider = Provider<UpdateBookShelfUseCase>((ref) {
   return UpdateBookShelfUseCase(ref.watch(bookRepositoryProvider));
 });
 
-final updateBookProgressUseCaseProvider = Provider<UpdateBookProgressUseCase>((ref) {
+final updateBookProgressUseCaseProvider = Provider<UpdateBookProgressUseCase>((
+  ref,
+) {
   return UpdateBookProgressUseCase(ref.watch(bookRepositoryProvider));
 });
 
@@ -67,7 +69,9 @@ final getShelfStatsUseCaseProvider = Provider<GetShelfStatsUseCase>((ref) {
   return GetShelfStatsUseCase(ref.watch(bookRepositoryProvider));
 });
 
-final getDashboardStatsUseCaseProvider = Provider<GetDashboardStatsUseCase>((ref) {
+final getDashboardStatsUseCaseProvider = Provider<GetDashboardStatsUseCase>((
+  ref,
+) {
   return GetDashboardStatsUseCase(ref.watch(bookRepositoryProvider));
 });
 
@@ -111,7 +115,11 @@ class BookState {
     this.books = const [],
     this.isLoading = false,
     this.errorMessage,
-    this.shelfStats = const {'wantToRead': 0, 'currentlyReading': 0, 'finishedReading': 0},
+    this.shelfStats = const {
+      'wantToRead': 0,
+      'currentlyReading': 0,
+      'finishedReading': 0,
+    },
     this.dashboardStats,
     this.isDashboardLoading = false,
     this.goals = const [],
@@ -161,7 +169,9 @@ class BookState {
       isGoalsLoading: isGoalsLoading ?? this.isGoalsLoading,
       searchText: searchText ?? this.searchText,
       selectedGenre: clearGenre ? null : (selectedGenre ?? this.selectedGenre),
-      selectedRating: clearRating ? null : (selectedRating ?? this.selectedRating),
+      selectedRating: clearRating
+          ? null
+          : (selectedRating ?? this.selectedRating),
       selectedShelf: clearShelf ? null : (selectedShelf ?? this.selectedShelf),
       sortOption: sortOption ?? this.sortOption,
       currentPage: currentPage ?? this.currentPage,
@@ -202,20 +212,20 @@ class BookNotifier extends StateNotifier<BookState> {
     required GetGoalsUseCase getGoalsUseCase,
     required CreateGoalUseCase createGoalUseCase,
     required UpdateGoalUseCase updateGoalUseCase,
-  })  : _getBooksUseCase = getBooksUseCase,
-        _getBookDetailsUseCase = getBookDetailsUseCase,
-        _addBookUseCase = addBookUseCase,
-        _editBookUseCase = editBookUseCase,
-        _deleteBookUseCase = deleteBookUseCase,
-        _updateBookShelfUseCase = updateBookShelfUseCase,
-        _updateBookProgressUseCase = updateBookProgressUseCase,
-        _addReviewUseCase = addReviewUseCase,
-        _getShelfStatsUseCase = getShelfStatsUseCase,
-        _getDashboardStatsUseCase = getDashboardStatsUseCase,
-        _getGoalsUseCase = getGoalsUseCase,
-        _createGoalUseCase = createGoalUseCase,
-        _updateGoalUseCase = updateGoalUseCase,
-        super(BookState());
+  }) : _getBooksUseCase = getBooksUseCase,
+       _getBookDetailsUseCase = getBookDetailsUseCase,
+       _addBookUseCase = addBookUseCase,
+       _editBookUseCase = editBookUseCase,
+       _deleteBookUseCase = deleteBookUseCase,
+       _updateBookShelfUseCase = updateBookShelfUseCase,
+       _updateBookProgressUseCase = updateBookProgressUseCase,
+       _addReviewUseCase = addReviewUseCase,
+       _getShelfStatsUseCase = getShelfStatsUseCase,
+       _getDashboardStatsUseCase = getDashboardStatsUseCase,
+       _getGoalsUseCase = getGoalsUseCase,
+       _createGoalUseCase = createGoalUseCase,
+       _updateGoalUseCase = updateGoalUseCase,
+       super(BookState());
 
   // Setters triggering updates
   void setSearchText(String text) {
@@ -295,7 +305,7 @@ class BookNotifier extends StateNotifier<BookState> {
 
       final books = data['books'] as List<Book>;
       final pagination = data['pagination'] as Map<String, dynamic>;
-      
+
       state = state.copyWith(
         books: books,
         shelfStats: shelfStats,
@@ -331,7 +341,11 @@ class BookNotifier extends StateNotifier<BookState> {
   }
 
   // Edit Book
-  Future<bool> editBook(int id, Map<String, String> fields, String? coverPath) async {
+  Future<bool> editBook(
+    int id,
+    Map<String, String> fields,
+    String? coverPath,
+  ) async {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
       await _editBookUseCase.execute(id, fields, coverPath);
@@ -399,7 +413,11 @@ class BookNotifier extends StateNotifier<BookState> {
   }
 
   // Update book reading page progress
-  Future<bool> updateBookProgress(int id, int currentPage, int totalPages) async {
+  Future<bool> updateBookProgress(
+    int id,
+    int currentPage,
+    int totalPages,
+  ) async {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
       await _updateBookProgressUseCase.execute(id, currentPage, totalPages);
@@ -415,7 +433,12 @@ class BookNotifier extends StateNotifier<BookState> {
   }
 
   // Submit a rating and review for a completed book
-  Future<bool> addReview(int id, String completionDate, int rating, String? review) async {
+  Future<bool> addReview(
+    int id,
+    String completionDate,
+    int rating,
+    String? review,
+  ) async {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
       await _addReviewUseCase.execute(id, completionDate, rating, review);
@@ -494,7 +517,9 @@ class BookNotifier extends StateNotifier<BookState> {
 }
 
 // Global Provider
-final bookNotifierProvider = StateNotifierProvider<BookNotifier, BookState>((ref) {
+final bookNotifierProvider = StateNotifierProvider<BookNotifier, BookState>((
+  ref,
+) {
   return BookNotifier(
     getBooksUseCase: ref.watch(getBooksUseCaseProvider),
     getBookDetailsUseCase: ref.watch(getBookDetailsUseCaseProvider),

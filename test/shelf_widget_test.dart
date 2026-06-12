@@ -162,16 +162,16 @@ void main() {
 
       expect(mockBookRepository.getBookCalled, isTrue);
       expect(find.text('Design Patterns'), findsOneWidget);
-      expect(find.text('Want To Read'), findsOneWidget); // current shelf display
+      expect(find.text('Wishlist'), findsOneWidget); // current shelf display
 
       // Tap on the shelf status tag chip/button to open change shelf bottom sheet
-      await tester.tap(find.text('Want To Read'));
+      await tester.tap(find.text('Wishlist'));
       await tester.pumpAndSettle();
 
       // Bottom sheet should open displaying shelf options
       expect(find.text('Move to Shelf'), findsOneWidget);
-      expect(find.text('Currently Reading'), findsOneWidget);
-      expect(find.text('Finished Reading'), findsOneWidget);
+      expect(find.text('Reading'), findsOneWidget);
+      expect(find.text('Completed'), findsOneWidget);
     });
 
     testWidgets('moving to Currently Reading shelf updates status', (WidgetTester tester) async {
@@ -202,11 +202,11 @@ void main() {
       await tester.pumpAndSettle();
 
       // Tap shelf tag to open bottom sheet
-      await tester.tap(find.text('Want To Read'));
+      await tester.tap(find.text('Wishlist'));
       await tester.pumpAndSettle();
 
       // Select Currently Reading option
-      await tester.tap(find.text('Currently Reading'));
+      await tester.tap(find.text('Reading'));
       await tester.pumpAndSettle();
 
       expect(mockBookRepository.updateShelfCalled, isTrue);

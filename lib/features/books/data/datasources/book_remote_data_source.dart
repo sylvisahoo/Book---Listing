@@ -33,13 +33,12 @@ class BookRemoteDataSource {
       if (sort != null && sort.isNotEmpty) 'sort': sort,
     };
 
-    final uri = Uri.parse('$baseUrl/api/books').replace(queryParameters: queryParams);
+    final uri = Uri.parse(
+      '$baseUrl/api/books',
+    ).replace(queryParameters: queryParams);
     final response = await http.get(
       uri,
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Accept': 'application/json',
-      },
+      headers: {'Authorization': 'Bearer $token', 'Accept': 'application/json'},
     );
 
     final data = json.decode(response.body);
@@ -58,10 +57,7 @@ class BookRemoteDataSource {
     final url = Uri.parse('$baseUrl/api/books/$id');
     final response = await http.get(
       url,
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Accept': 'application/json',
-      },
+      headers: {'Authorization': 'Bearer $token', 'Accept': 'application/json'},
     );
 
     final data = json.decode(response.body);
@@ -127,10 +123,7 @@ class BookRemoteDataSource {
     final url = Uri.parse('$baseUrl/api/books/$id');
     final response = await http.delete(
       url,
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Accept': 'application/json',
-      },
+      headers: {'Authorization': 'Bearer $token', 'Accept': 'application/json'},
     );
 
     if (response.statusCode != 200) {
@@ -191,10 +184,7 @@ class BookRemoteDataSource {
     final url = Uri.parse('$baseUrl/api/books/shelves/stats');
     final response = await http.get(
       url,
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Accept': 'application/json',
-      },
+      headers: {'Authorization': 'Bearer $token', 'Accept': 'application/json'},
     );
 
     final data = json.decode(response.body);
@@ -243,10 +233,7 @@ class BookRemoteDataSource {
     final url = Uri.parse('$baseUrl/api/dashboard/stats');
     final response = await http.get(
       url,
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Accept': 'application/json',
-      },
+      headers: {'Authorization': 'Bearer $token', 'Accept': 'application/json'},
     );
 
     final data = json.decode(response.body);
@@ -262,10 +249,7 @@ class BookRemoteDataSource {
     final url = Uri.parse('$baseUrl/api/goals');
     final response = await http.get(
       url,
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Accept': 'application/json',
-      },
+      headers: {'Authorization': 'Bearer $token', 'Accept': 'application/json'},
     );
 
     final data = json.decode(response.body);

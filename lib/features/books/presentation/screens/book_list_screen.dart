@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/config/api_config.dart';
 import '../../domain/entities/book.dart';
 import '../providers/book_provider.dart';
+import '../widgets/book_cover_widget.dart';
+import '../widgets/sakura_background.dart';
 
 class BookListScreen extends ConsumerStatefulWidget {
   const BookListScreen({super.key});
@@ -33,11 +35,11 @@ class _BookListScreenState extends ConsumerState<BookListScreen> {
   Color _getShelfColor(String shelf) {
     switch (shelf) {
       case 'Finished Reading':
-        return const Color(0xFFFF8FA3);
+        return const Color(0xFFE78FB3); // Rose Pink (Completed)
       case 'Currently Reading':
-        return const Color(0xFFFFB3C6);
+        return const Color(0xFF8B7E95); // Cozy Lavender (Reading)
       default:
-        return const Color(0xFFFFC09F);
+        return const Color(0xFFF8BBD9); // Pastel Pink (Wishlist)
     }
   }
 
@@ -93,14 +95,14 @@ class _BookListScreenState extends ConsumerState<BookListScreen> {
       onPressed: onPressed,
       label: Text(label),
       labelStyle: TextStyle(
-        color: isActive ? const Color(0xFF4A2B33) : const Color(0xFF9A6A73),
+        color: isActive ? const Color(0xFF3A3142) : const Color(0xFF8B7E95),
         fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
       ),
       backgroundColor: isActive
-          ? const Color(0xFFFF6F91)
+          ? const Color(0xFFE78FB3)
           : const Color(0xFFFFFFFF),
       side: BorderSide(
-        color: isActive ? const Color(0xFFFF6F91) : const Color(0xFFFFD6CC),
+        color: isActive ? const Color(0xFFE78FB3) : const Color(0xFFFFDCE8),
       ),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     );
@@ -267,12 +269,16 @@ class _BookListScreenState extends ConsumerState<BookListScreen> {
     final isLoading = bookState.isLoading;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF5F1),
+      backgroundColor: const Color(0xFFFFF8FA),
       appBar: AppBar(
         title: const Text(
           'My Library',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF3A3142),
+          ),
         ),
+        iconTheme: const IconThemeData(color: Color(0xFF3A3142)),
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
@@ -281,7 +287,7 @@ class _BookListScreenState extends ConsumerState<BookListScreen> {
               bookState.selectedShelf != null ||
               bookState.searchText.isNotEmpty)
             IconButton(
-              icon: const Icon(Icons.filter_alt_off, color: Color(0xFFFF6F91)),
+              icon: const Icon(Icons.filter_alt_off, color: Color(0xFFE78FB3)),
               onPressed: () {
                 _searchController.clear();
                 notifier.clearFilters();
@@ -289,82 +295,89 @@ class _BookListScreenState extends ConsumerState<BookListScreen> {
             ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: Column(
-          children: [
-            // Search Input
-            TextField(
-              controller: _searchController,
-              onChanged: (val) => notifier.setSearchText(val),
-              style: const TextStyle(color: Color(0xFF4A2B33)),
-              decoration: InputDecoration(
-                hintText: 'Search by title or author...',
-                hintStyle: const TextStyle(color: Color(0xFF9A6A73)),
-                prefixIcon: const Icon(Icons.search, color: Color(0xFF9A6A73)),
-                filled: true,
-                fillColor: const Color(0xFFFFFFFF),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: const BorderSide(color: Color(0xFFFFD6CC)),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: const BorderSide(
-                    color: Color(0xFFFF6F91),
-                    width: 1.5,
+      body: SakuraBackground(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Column(
+            children: [
+              // Search Input
+              TextField(
+                controller: _searchController,
+                onChanged: (val) => notifier.setSearchText(val),
+                style: const TextStyle(color: Color(0xFF3A3142)),
+                decoration: InputDecoration(
+                  hintText: 'Search by title or author...',
+                  hintStyle: const TextStyle(color: Color(0xFF8B7E95)),
+                  prefixIcon: const Icon(
+                    Icons.search,
+                    color: Color(0xFF8B7E95),
+                  ),
+                  filled: true,
+                  fillColor: const Color(0xFFFFFFFF),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: const BorderSide(color: Color(0xFFFFDCE8)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: const BorderSide(
+                      color: Color(0xFFE78FB3),
+                      width: 1.5,
+                    ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 12),
+              const SizedBox(height: 12),
 
-            // Shelf Stats Summary Header
-            _buildStatsHeader(bookState),
+              // Shelf Stats Summary Header
+              _buildStatsHeader(bookState),
 
-            // Filter tags row
-            _buildFilterRow(bookState, notifier),
-            const SizedBox(height: 16),
+              // Filter tags row
+              _buildFilterRow(bookState, notifier),
+              const SizedBox(height: 16),
 
-            // Book Grid / Lists
-            Expanded(
-              child: isLoading
-                  ? const Center(
-                      child: CircularProgressIndicator(
-                        color: Color(0xFFFF6F91),
-                      ),
-                    )
-                  : books.isEmpty
-                      ? _buildEmptyState(bookState, notifier)
-                      : Column(
-                          children: [
-                            Expanded(
-                              child: GridView.builder(
-                                gridDelegate:
-                                    const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2,
-                                  crossAxisSpacing: 16,
-                                  mainAxisSpacing: 16,
-                                  childAspectRatio: 0.65,
-                                ),
-                                itemCount: books.length,
-                                itemBuilder: (context, index) {
-                                  final book = books[index];
-                                  return _buildBookCard(book);
-                                },
-                              ),
-                            ),
-                            // Pagination Footer
-                            _buildPaginationControls(bookState, notifier),
-                          ],
+              // Book Grid / Lists
+              Expanded(
+                child: isLoading
+                    ? const Center(
+                        child: CircularProgressIndicator(
+                          color: Color(0xFFE78FB3),
                         ),
-            ),
-          ],
+                      )
+                    : books.isEmpty
+                    ? _buildEmptyState(bookState, notifier)
+                    : Column(
+                        children: [
+                          Expanded(
+                            child: GridView.builder(
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2,
+                                    crossAxisSpacing: 16,
+                                    mainAxisSpacing: 16,
+                                    childAspectRatio: 0.65,
+                                  ),
+                              itemCount: books.length,
+                              itemBuilder: (context, index) {
+                                final book = books[index];
+                                return _buildBookCard(book);
+                              },
+                            ),
+                          ),
+                          // Pagination Footer
+                          _buildPaginationControls(bookState, notifier),
+                        ],
+                      ),
+              ),
+            ],
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color(0xFFFF6F91),
-        child: const Icon(Icons.add, color: Color(0xFF4A2B33)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
+        elevation: 4,
+        backgroundColor: const Color(0xFFE78FB3),
+        child: const Icon(Icons.add, color: Colors.white),
         onPressed: () async {
           final result = await Navigator.pushNamed(context, '/add-edit-book');
           if (result == true) {
@@ -376,7 +389,8 @@ class _BookListScreenState extends ConsumerState<BookListScreen> {
   }
 
   Widget _buildEmptyState(BookState state, BookNotifier notifier) {
-    final hasActiveFilters = state.selectedGenre != null ||
+    final hasActiveFilters =
+        state.selectedGenre != null ||
         state.selectedRating != null ||
         state.selectedShelf != null ||
         state.searchText.isNotEmpty;
@@ -385,13 +399,13 @@ class _BookListScreenState extends ConsumerState<BookListScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.menu_book, size: 80, color: Color(0xFFFFD6CC)),
+          const Icon(Icons.menu_book, size: 80, color: Color(0xFFFFDCE8)),
           const SizedBox(height: 16),
           Text(
             hasActiveFilters ? 'No Matching Books' : 'No Books Found',
             style: const TextStyle(
               fontSize: 18,
-              color: Color(0xFF4A2B33),
+              color: Color(0xFF3A3142),
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -403,24 +417,31 @@ class _BookListScreenState extends ConsumerState<BookListScreen> {
                   ? 'No results match your active filters or search terms.'
                   : 'Add your first book or adjust filters.',
               textAlign: TextAlign.center,
-              style: const TextStyle(color: Color(0xFF9A6A73)),
+              style: const TextStyle(color: Color(0xFF8B7E95)),
             ),
           ),
           if (hasActiveFilters) ...[
             const SizedBox(height: 20),
             ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFF6F91),
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                backgroundColor: const Color(0xFFE78FB3),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 10,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              icon: const Icon(Icons.filter_alt_off, color: Color(0xFF4A2B33), size: 18),
+              icon: const Icon(
+                Icons.filter_alt_off,
+                color: Color(0xFF3A3142),
+                size: 18,
+              ),
               label: const Text(
                 'Clear All Filters',
                 style: TextStyle(
-                  color: Color(0xFF4A2B33),
+                  color: Color(0xFF3A3142),
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -443,8 +464,15 @@ class _BookListScreenState extends ConsumerState<BookListScreen> {
       child: Container(
         decoration: BoxDecoration(
           color: const Color(0xFFFFFFFF),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFFFFD6CC)),
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFFE78FB3).withOpacity(0.06),
+              blurRadius: 15,
+              offset: const Offset(0, 8),
+            ),
+          ],
+          border: Border.all(color: const Color(0xFFFFDCE8).withOpacity(0.4)),
         ),
         clipBehavior: Clip.antiAlias,
         child: Column(
@@ -457,9 +485,9 @@ class _BookListScreenState extends ConsumerState<BookListScreen> {
                       '${ApiConfig.baseUrl}${book.coverImage}',
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) =>
-                          _buildCoverPlaceholder(),
+                          _buildCoverPlaceholder(book),
                     )
-                  : _buildCoverPlaceholder(),
+                  : _buildCoverPlaceholder(book),
             ),
 
             // Metadata
@@ -473,7 +501,7 @@ class _BookListScreenState extends ConsumerState<BookListScreen> {
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
-                      color: Color(0xFF4A2B33),
+                      color: Color(0xFF3A3142),
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -483,7 +511,7 @@ class _BookListScreenState extends ConsumerState<BookListScreen> {
                     book.author,
                     style: const TextStyle(
                       fontSize: 12,
-                      color: Color(0xFF9A6A73),
+                      color: Color(0xFF8B7E95),
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -500,15 +528,15 @@ class _BookListScreenState extends ConsumerState<BookListScreen> {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: _getShelfColor(book.shelf).withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(8),
+                          color: _getShelfColor(book.shelf).withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
                           book.shelf == 'Want To Read'
-                              ? 'Want'
+                              ? 'Wishlist'
                               : book.shelf == 'Currently Reading'
-                                  ? 'Reading'
-                                  : 'Read',
+                              ? 'Reading'
+                              : 'Completed',
                           style: TextStyle(
                             fontSize: 10,
                             color: _getShelfColor(book.shelf),
@@ -520,16 +548,16 @@ class _BookListScreenState extends ConsumerState<BookListScreen> {
                         Row(
                           children: [
                             const Icon(
-                              Icons.star,
-                              size: 12,
-                              color: Color(0xFFFF9EAA),
+                              Icons.star_rounded,
+                              size: 14,
+                              color: Color(0xFFFFB020),
                             ),
                             const SizedBox(width: 2),
                             Text(
                               '${book.rating}',
                               style: const TextStyle(
                                 fontSize: 10,
-                                color: Color(0xFFFF9EAA),
+                                color: Color(0xFF3A3142),
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -546,13 +574,8 @@ class _BookListScreenState extends ConsumerState<BookListScreen> {
     );
   }
 
-  Widget _buildCoverPlaceholder() {
-    return Container(
-      color: const Color(0xFFFFD6CC),
-      child: const Center(
-        child: Icon(Icons.book, size: 48, color: Color(0xFF9A6A73)),
-      ),
-    );
+  Widget _buildCoverPlaceholder(Book book) {
+    return BookCoverWidget(title: book.title, author: book.author);
   }
 
   Widget _buildPaginationControls(BookState state, BookNotifier notifier) {
@@ -566,21 +589,21 @@ class _BookListScreenState extends ConsumerState<BookListScreen> {
           IconButton(
             icon: const Icon(Icons.arrow_back_ios, size: 16),
             color: state.currentPage > 1
-                ? const Color(0xFFFF6F91)
-                : const Color(0xFFFFD6CC),
+                ? const Color(0xFFE78FB3)
+                : const Color(0xFFFFDCE8),
             onPressed: state.currentPage > 1
                 ? () => notifier.setPage(state.currentPage - 1)
                 : null,
           ),
           Text(
             'Page ${state.currentPage} of ${state.totalPages}',
-            style: const TextStyle(color: Color(0xFF4A2B33), fontSize: 13),
+            style: const TextStyle(color: Color(0xFF3A3142), fontSize: 13),
           ),
           IconButton(
             icon: const Icon(Icons.arrow_forward_ios, size: 16),
             color: state.currentPage < state.totalPages
-                ? const Color(0xFFFF6F91)
-                : const Color(0xFFFFD6CC),
+                ? const Color(0xFFE78FB3)
+                : const Color(0xFFFFDCE8),
             onPressed: state.currentPage < state.totalPages
                 ? () => notifier.setPage(state.currentPage + 1)
                 : null,
@@ -598,7 +621,7 @@ class _BookListScreenState extends ConsumerState<BookListScreen> {
       decoration: BoxDecoration(
         color: const Color(0xFFFFFFFF),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFFFD6CC)),
+        border: Border.all(color: const Color(0xFFFFDCE8)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -606,19 +629,19 @@ class _BookListScreenState extends ConsumerState<BookListScreen> {
           _buildStatItem(
             'Want to Read',
             stats['wantToRead'] ?? 0,
-            const Color(0xFFFFC09F),
+            const Color(0xFF06B6D4),
           ),
           _buildDivider(),
           _buildStatItem(
             'Reading',
             stats['currentlyReading'] ?? 0,
-            const Color(0xFFFFB3C6),
+            const Color(0xFF14B8A6),
           ),
           _buildDivider(),
           _buildStatItem(
             'Finished',
             stats['finishedReading'] ?? 0,
-            const Color(0xFFFF8FA3),
+            const Color(0xFF0F766E),
           ),
         ],
       ),
@@ -626,7 +649,7 @@ class _BookListScreenState extends ConsumerState<BookListScreen> {
   }
 
   Widget _buildDivider() {
-    return Container(height: 24, width: 1, color: const Color(0xFFFFD6CC));
+    return Container(height: 24, width: 1, color: const Color(0xFFFFDCE8));
   }
 
   Widget _buildStatItem(String label, int count, Color color) {
@@ -643,7 +666,7 @@ class _BookListScreenState extends ConsumerState<BookListScreen> {
         const SizedBox(height: 2),
         Text(
           label,
-          style: const TextStyle(fontSize: 11, color: Color(0xFF9A6A73)),
+          style: const TextStyle(fontSize: 11, color: Color(0xFF8B7E95)),
         ),
       ],
     );

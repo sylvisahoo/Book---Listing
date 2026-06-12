@@ -43,9 +43,10 @@ final logoutUseCaseProvider = Provider<LogoutUseCase>((ref) {
   return LogoutUseCase(ref.watch(authRepositoryProvider));
 });
 
-final requestPasswordResetUseCaseProvider = Provider<RequestPasswordResetUseCase>((ref) {
-  return RequestPasswordResetUseCase(ref.watch(authRepositoryProvider));
-});
+final requestPasswordResetUseCaseProvider =
+    Provider<RequestPasswordResetUseCase>((ref) {
+      return RequestPasswordResetUseCase(ref.watch(authRepositoryProvider));
+    });
 
 final resetPasswordUseCaseProvider = Provider<ResetPasswordUseCase>((ref) {
   return ResetPasswordUseCase(ref.watch(authRepositoryProvider));
@@ -98,13 +99,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
     required LogoutUseCase logoutUseCase,
     required RequestPasswordResetUseCase requestPasswordResetUseCase,
     required ResetPasswordUseCase resetPasswordUseCase,
-  })  : _checkAuthStatusUseCase = checkAuthStatusUseCase,
-        _loginUseCase = loginUseCase,
-        _registerUseCase = registerUseCase,
-        _logoutUseCase = logoutUseCase,
-        _requestPasswordResetUseCase = requestPasswordResetUseCase,
-        _resetPasswordUseCase = resetPasswordUseCase,
-        super(AuthState()) {
+  }) : _checkAuthStatusUseCase = checkAuthStatusUseCase,
+       _loginUseCase = loginUseCase,
+       _registerUseCase = registerUseCase,
+       _logoutUseCase = logoutUseCase,
+       _requestPasswordResetUseCase = requestPasswordResetUseCase,
+       _resetPasswordUseCase = resetPasswordUseCase,
+       super(AuthState()) {
     checkAuthStatus();
   }
 
@@ -212,10 +213,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       return token;
     } catch (e) {
       final errorMsg = e.toString().replaceAll('Exception: ', '');
-      state = state.copyWith(
-        errorMessage: errorMsg,
-        isLoading: false,
-      );
+      state = state.copyWith(errorMessage: errorMsg, isLoading: false);
       return null;
     }
   }
@@ -233,17 +231,16 @@ class AuthNotifier extends StateNotifier<AuthState> {
       return true;
     } catch (e) {
       final errorMsg = e.toString().replaceAll('Exception: ', '');
-      state = state.copyWith(
-        errorMessage: errorMsg,
-        isLoading: false,
-      );
+      state = state.copyWith(errorMessage: errorMsg, isLoading: false);
       return false;
     }
   }
 }
 
 // Global Provider Exposing Auth State and Controller
-final authNotifierProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
+final authNotifierProvider = StateNotifierProvider<AuthNotifier, AuthState>((
+  ref,
+) {
   return AuthNotifier(
     checkAuthStatusUseCase: ref.watch(checkAuthStatusUseCaseProvider),
     loginUseCase: ref.watch(loginUseCaseProvider),

@@ -13,11 +13,7 @@ import 'features/books/presentation/screens/stats_dashboard_screen.dart';
 import 'features/books/presentation/screens/reading_goals_screen.dart';
 
 void main() {
-  runApp(
-    const ProviderScope(
-      child: MyApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends ConsumerWidget {
@@ -33,35 +29,33 @@ class MyApp extends ConsumerWidget {
       theme: ThemeData(
         useMaterial3: true,
         brightness: Brightness.light,
-        primaryColor: const Color(0xFFFF6F91),
-        scaffoldBackgroundColor: const Color(0xFFFFF5F1),
+        primaryColor: const Color(0xFFE78FB3),
+        scaffoldBackgroundColor: const Color(0xFFFFF8FA),
         colorScheme: const ColorScheme.light(
-          primary: Color(0xFFFF6F91),
-          onPrimary: Color(0xFF4A2B33),
-          secondary: Color(0xFFFFC2D1),
-          onSecondary: Color(0xFF4A2B33),
+          primary: Color(0xFFE78FB3),
+          onPrimary: Color(0xFFFFFFFF),
+          secondary: Color(0xFFF8BBD9),
+          onSecondary: Color(0xFF3A3142),
           surface: Color(0xFFFFFFFF),
-          onSurface: Color(0xFF4A2B33),
-          error: Color(0xFFE85D75),
+          onSurface: Color(0xFF3A3142),
+          error: Color(0xFFE57373),
         ),
         textTheme: ThemeData.light().textTheme.apply(
           fontFamily: 'Outfit',
-          bodyColor: const Color(0xFF4A2B33),
-          displayColor: const Color(0xFF4A2B33),
+          bodyColor: const Color(0xFF3A3142),
+          displayColor: const Color(0xFF3A3142),
         ),
       ),
       home: authState.isLoading
           ? const Scaffold(
-              backgroundColor: Color(0xFFFFF5F1),
+              backgroundColor: Color(0xFFFFF8FA),
               body: Center(
-                child: CircularProgressIndicator(
-                  color: Color(0xFFFF6F91),
-                ),
+                child: CircularProgressIndicator(color: Color(0xFFE78FB3)),
               ),
             )
           : authState.isAuthenticated
-              ? const HomeScreen()
-              : const LoginScreen(),
+          ? const HomeScreen()
+          : const LoginScreen(),
       routes: {
         '/register': (context) => const RegisterScreen(),
         '/reset-request': (context) => const ResetRequestScreen(),

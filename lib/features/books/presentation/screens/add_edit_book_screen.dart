@@ -5,6 +5,8 @@ import 'dart:io';
 import '../../../../core/config/api_config.dart';
 import '../../domain/entities/book.dart';
 import '../providers/book_provider.dart';
+import '../widgets/book_cover_widget.dart';
+import '../widgets/sakura_background.dart';
 
 class AddEditBookScreen extends ConsumerStatefulWidget {
   const AddEditBookScreen({super.key});
@@ -36,6 +38,17 @@ class _AddEditBookScreenState extends ConsumerState<AddEditBookScreen> {
   final _picker = ImagePicker();
 
   @override
+  void initState() {
+    super.initState();
+    _titleController.addListener(_onTextChanged);
+    _authorController.addListener(_onTextChanged);
+  }
+
+  void _onTextChanged() {
+    setState(() {});
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!_initialized) {
@@ -63,6 +76,8 @@ class _AddEditBookScreenState extends ConsumerState<AddEditBookScreen> {
 
   @override
   void dispose() {
+    _titleController.removeListener(_onTextChanged);
+    _authorController.removeListener(_onTextChanged);
     _titleController.dispose();
     _authorController.dispose();
     _genreController.dispose();
@@ -99,10 +114,10 @@ class _AddEditBookScreenState extends ConsumerState<AddEditBookScreen> {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.dark(
-              primary: Color(0xFFFF6F91),
-              onPrimary: Color(0xFF4A2B33),
+              primary: Color(0xFFE78FB3),
+              onPrimary: Color(0xFFFFFFFF),
               surface: Color(0xFFFFFFFF),
-              onSurface: Color(0xFF4A2B33),
+              onSurface: Color(0xFF3A3142),
             ),
           ),
           child: child!,
@@ -141,13 +156,13 @@ class _AddEditBookScreenState extends ConsumerState<AddEditBookScreen> {
 
     bool success;
     if (_isEditMode) {
-      success = await ref.read(bookNotifierProvider.notifier).editBook(
-        _existingBook!.id,
-        fields,
-        _selectedImagePath,
-      );
+      success = await ref
+          .read(bookNotifierProvider.notifier)
+          .editBook(_existingBook!.id, fields, _selectedImagePath);
     } else {
-      success = await ref.read(bookNotifierProvider.notifier).addBook(fields, _selectedImagePath);
+      success = await ref
+          .read(bookNotifierProvider.notifier)
+          .addBook(fields, _selectedImagePath);
     }
 
     if (!mounted) return;
@@ -160,7 +175,7 @@ class _AddEditBookScreenState extends ConsumerState<AddEditBookScreen> {
                 ? 'Book updated successfully'
                 : 'Book added successfully',
           ),
-          backgroundColor: const Color(0xFFFF6F91),
+          backgroundColor: const Color(0xFFE78FB3),
         ),
       );
       Navigator.pop(context, true);
@@ -172,18 +187,18 @@ class _AddEditBookScreenState extends ConsumerState<AddEditBookScreen> {
           backgroundColor: const Color(0xFFFFFFFF),
           title: const Text(
             'Error',
-            style: TextStyle(color: Color(0xFF4A2B33)),
+            style: TextStyle(color: Color(0xFF3A3142)),
           ),
           content: Text(
             bookState.errorMessage ?? 'Operation failed.',
-            style: const TextStyle(color: Color(0xFF9A6A73)),
+            style: const TextStyle(color: Color(0xFF8B7E95)),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
               child: const Text(
                 'OK',
-                style: TextStyle(color: Color(0xFFFF6F91)),
+                style: TextStyle(color: Color(0xFFE78FB3)),
               ),
             ),
           ],
@@ -198,407 +213,438 @@ class _AddEditBookScreenState extends ConsumerState<AddEditBookScreen> {
     final isLoading = bookState.isLoading;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF5F1),
+      backgroundColor: const Color(0xFFFFF8FA),
       appBar: AppBar(
+        iconTheme: const IconThemeData(color: Color(0xFF3A3142)),
         title: Text(
           _isEditMode ? 'Edit Book' : 'Add Book',
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF3A3142),
+          ),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Color(0xFF4A2B33)),
+          icon: const Icon(Icons.arrow_back_ios_new, color: Color(0xFF3A3142)),
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: SafeArea(
-        child: isLoading
-            ? const Center(
-                child: CircularProgressIndicator(color: Color(0xFFFF6F91)),
-              )
-            : SingleChildScrollView(
-                padding: const EdgeInsets.all(24.0),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      // Cover Picker Box
-                      GestureDetector(
-                        onTap: _pickImage,
-                        child: Center(
-                          child: Container(
-                            height: 200,
-                            width: 140,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFFFFFFF),
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(
-                                color: const Color(0xFFFFD6CC),
+      body: SakuraBackground(
+        child: SafeArea(
+          child: isLoading
+              ? const Center(
+                  child: CircularProgressIndicator(color: Color(0xFFE78FB3)),
+                )
+              : SingleChildScrollView(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // Cover Picker Box
+                        GestureDetector(
+                          onTap: _pickImage,
+                          child: Center(
+                            child: Container(
+                              height: 200,
+                              width: 140,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFFFFFFF),
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: const Color(0xFFFFDCE8),
+                                ),
                               ),
-                            ),
-                            clipBehavior: Clip.antiAlias,
-                            child: _selectedImagePath != null
-                                ? Image.file(
-                                    File(_selectedImagePath!),
-                                    fit: BoxFit.cover,
-                                  )
-                                : _isEditMode &&
+                              clipBehavior: Clip.antiAlias,
+                              child: _selectedImagePath != null
+                                  ? Image.file(
+                                      File(_selectedImagePath!),
+                                      fit: BoxFit.cover,
+                                    )
+                                  : _isEditMode &&
                                         _existingBook!.coverImage != null
-                                    ? Image.network(
-                                        '${ApiConfig.baseUrl}${_existingBook!.coverImage}',
-                                        fit: BoxFit.cover,
-                                        errorBuilder:
-                                            (context, error, stackTrace) =>
-                                                _buildCoverPlaceholder(),
-                                      )
-                                    : _buildCoverPlaceholder(),
+                                  ? Image.network(
+                                      '${ApiConfig.baseUrl}${_existingBook!.coverImage}',
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) =>
+                                              _buildCoverPlaceholder(),
+                                    )
+                                  : _buildCoverPlaceholder(),
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 32),
+                        const SizedBox(height: 32),
 
-                      // Form Card
-                      Container(
-                        padding: const EdgeInsets.all(24),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFFFFFF),
-                          borderRadius: BorderRadius.circular(24),
-                          border: Border.all(color: const Color(0xFFFFD6CC)),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            // Title
-                            TextFormField(
-                              controller: _titleController,
-                              style: const TextStyle(color: Color(0xFF4A2B33)),
-                              decoration: _buildInputDecoration(
-                                'Book Title',
-                                Icons.title,
-                              ),
-                              validator: (value) =>
-                                  value == null || value.trim().isEmpty
-                                      ? 'Title is required'
-                                      : null,
-                            ),
-                            const SizedBox(height: 16),
-
-                            // Author
-                            TextFormField(
-                              controller: _authorController,
-                              style: const TextStyle(color: Color(0xFF4A2B33)),
-                              decoration: _buildInputDecoration(
-                                'Author',
-                                Icons.person_outline,
-                              ),
-                              validator: (value) =>
-                                  value == null || value.trim().isEmpty
-                                      ? 'Author is required'
-                                      : null,
-                            ),
-                            const SizedBox(height: 16),
-
-                            // Genre
-                            TextFormField(
-                              controller: _genreController,
-                              style: const TextStyle(color: Color(0xFF4A2B33)),
-                              decoration: _buildInputDecoration(
-                                'Genre',
-                                Icons.category_outlined,
-                              ),
-                              validator: (value) =>
-                                  value == null || value.trim().isEmpty
-                                      ? 'Genre is required'
-                                      : null,
-                            ),
-                            const SizedBox(height: 16),
-
-                            // Publication Year
-                            TextFormField(
-                              controller: _yearController,
-                              style: const TextStyle(color: Color(0xFF4A2B33)),
-                              keyboardType: TextInputType.number,
-                              decoration: _buildInputDecoration(
-                                'Publication Year',
-                                Icons.calendar_today_outlined,
-                              ),
-                              validator: (value) {
-                                if (value == null || value.trim().isEmpty) {
-                                  return 'Publication year is required';
-                                }
-                                final year = int.tryParse(value.trim());
-                                final currentYear = DateTime.now().year;
-                                if (year == null ||
-                                    year < 1000 ||
-                                    year > currentYear) {
-                                  return 'Invalid year (1000 - $currentYear)';
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: 16),
-
-                            // Shelf Assignment Selector
-                            DropdownButtonFormField<String>(
-                              value: _selectedShelf,
-                              style: const TextStyle(color: Color(0xFF4A2B33)),
-                              dropdownColor: const Color(0xFFFFFFFF),
-                              decoration: _buildInputDecoration(
-                                'Shelf',
-                                Icons.bookmark_outline,
-                              ),
-                              items: [
-                                'Want To Read',
-                                'Currently Reading',
-                                'Finished Reading',
-                              ]
-                                  .map(
-                                    (shelf) => DropdownMenuItem(
-                                      value: shelf,
-                                      child: Text(shelf),
-                                    ),
-                                  )
-                                  .toList(),
-                              onChanged: (val) {
-                                if (val != null) {
-                                  setState(() {
-                                    _selectedShelf = val;
-                                  });
-                                }
-                              },
-                            ),
-                            const SizedBox(height: 24),
-
-                            // Currently Reading Progress Fields
-                            if (_selectedShelf == 'Currently Reading') ...[
-                              const Text(
-                                'Reading Progress',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF4A2B33),
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: TextFormField(
-                                      controller: _currentPageController,
-                                      style: const TextStyle(
-                                        color: Color(0xFF4A2B33),
-                                      ),
-                                      keyboardType: TextInputType.number,
-                                      decoration: _buildInputDecoration(
-                                        'Current Page',
-                                        Icons.find_in_page_outlined,
-                                      ),
-                                      validator: (value) {
-                                        if (value == null ||
-                                            value.trim().isEmpty) {
-                                          return 'Required';
-                                        }
-                                        final val = int.tryParse(value.trim());
-                                        if (val == null || val < 0) {
-                                          return 'Invalid';
-                                        }
-                                        return null;
-                                      },
-                                    ),
-                                  ),
-                                  const SizedBox(width: 16),
-                                  Expanded(
-                                    child: TextFormField(
-                                      controller: _totalPagesController,
-                                      style: const TextStyle(
-                                        color: Color(0xFF4A2B33),
-                                      ),
-                                      keyboardType: TextInputType.number,
-                                      decoration: _buildInputDecoration(
-                                        'Total Pages',
-                                        Icons.library_books_outlined,
-                                      ),
-                                      validator: (value) {
-                                        if (value == null ||
-                                            value.trim().isEmpty) {
-                                          return 'Required';
-                                        }
-                                        final val = int.tryParse(value.trim());
-                                        if (val == null || val < 0) {
-                                          return 'Invalid';
-                                        }
-                                        final currVal = int.tryParse(
-                                          _currentPageController.text,
-                                        );
-                                        if (currVal != null && val < currVal) {
-                                          return 'Must be >= Current';
-                                        }
-                                        return null;
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 16),
-                            ],
-
-                            // Finished Reading Reviews/Ratings Fields
-                            if (_selectedShelf == 'Finished Reading') ...[
-                              const Text(
-                                'Review Details',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF4A2B33),
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                              // Completion Date
+                        // Form Card
+                        Container(
+                          padding: const EdgeInsets.all(24),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFFFFFF),
+                            borderRadius: BorderRadius.circular(24),
+                            border: Border.all(color: const Color(0xFFFFDCE8)),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              // Title
                               TextFormField(
-                                controller: _completionDateController,
+                                controller: _titleController,
                                 style: const TextStyle(
-                                  color: Color(0xFF4A2B33),
+                                  color: Color(0xFF3A3142),
                                 ),
-                                readOnly: true,
-                                onTap: _selectCompletionDate,
                                 decoration: _buildInputDecoration(
-                                  'Completion Date',
-                                  Icons.date_range_outlined,
+                                  'Book Title',
+                                  Icons.title,
                                 ),
                                 validator: (value) =>
-                                    value == null || value.isEmpty
-                                        ? 'Completion date is required'
-                                        : null,
+                                    value == null || value.trim().isEmpty
+                                    ? 'Title is required'
+                                    : null,
                               ),
                               const SizedBox(height: 16),
 
-                              // Star Rating Selector
-                              DropdownButtonFormField<int>(
-                                value: _selectedRating,
-                                style: const TextStyle(
-                                  color: Color(0xFF4A2B33),
-                                ),
-                                dropdownColor: const Color(0xFFFFFFFF),
-                                decoration: _buildInputDecoration(
-                                  'Rating',
-                                  Icons.star_border,
-                                ),
-                                items: [5, 4, 3, 2, 1]
-                                    .map(
-                                      (stars) => DropdownMenuItem(
-                                        value: stars,
-                                        child: Text('$stars Stars'),
-                                      ),
-                                    )
-                                    .toList(),
-                                onChanged: (val) {
-                                  if (val != null) {
-                                    setState(() {
-                                      _selectedRating = val;
-                                    });
-                                  }
-                                },
-                              ),
-                              const SizedBox(height: 16),
-
-                              // Review Text
+                              // Author
                               TextFormField(
-                                controller: _reviewController,
+                                controller: _authorController,
                                 style: const TextStyle(
-                                  color: Color(0xFF4A2B33),
+                                  color: Color(0xFF3A3142),
                                 ),
-                                maxLines: 4,
                                 decoration: _buildInputDecoration(
-                                  'Write a Review (Optional)',
-                                  Icons.rate_review_outlined,
+                                  'Author',
+                                  Icons.person_outline,
+                                ),
+                                validator: (value) =>
+                                    value == null || value.trim().isEmpty
+                                    ? 'Author is required'
+                                    : null,
+                              ),
+                              const SizedBox(height: 16),
+
+                              // Genre
+                              TextFormField(
+                                controller: _genreController,
+                                style: const TextStyle(
+                                  color: Color(0xFF3A3142),
+                                ),
+                                decoration: _buildInputDecoration(
+                                  'Genre',
+                                  Icons.category_outlined,
+                                ),
+                                validator: (value) =>
+                                    value == null || value.trim().isEmpty
+                                    ? 'Genre is required'
+                                    : null,
+                              ),
+                              const SizedBox(height: 16),
+
+                              // Publication Year
+                              TextFormField(
+                                controller: _yearController,
+                                style: const TextStyle(
+                                  color: Color(0xFF3A3142),
+                                ),
+                                keyboardType: TextInputType.number,
+                                decoration: _buildInputDecoration(
+                                  'Publication Year',
+                                  Icons.calendar_today_outlined,
                                 ),
                                 validator: (value) {
-                                  if (value != null && value.length > 2000) {
-                                    return 'Review cannot exceed 2000 characters';
+                                  if (value == null || value.trim().isEmpty) {
+                                    return 'Publication year is required';
+                                  }
+                                  final year = int.tryParse(value.trim());
+                                  final currentYear = DateTime.now().year;
+                                  if (year == null ||
+                                      year < 1000 ||
+                                      year > currentYear) {
+                                    return 'Invalid year (1000 - $currentYear)';
                                   }
                                   return null;
                                 },
                               ),
                               const SizedBox(height: 16),
-                            ],
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 32),
 
-                      // Submit Button
-                      Container(
-                        height: 56,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFFFF6F91), Color(0xFFFFC2D1)],
+                              // Shelf Assignment Selector
+                              DropdownButtonFormField<String>(
+                                value: _selectedShelf,
+                                style: const TextStyle(
+                                  color: Color(0xFF3A3142),
+                                ),
+                                dropdownColor: const Color(0xFFFFFFFF),
+                                decoration: _buildInputDecoration(
+                                  'Shelf',
+                                  Icons.bookmark_outline,
+                                ),
+                                items:
+                                    [
+                                          'Want To Read',
+                                          'Currently Reading',
+                                          'Finished Reading',
+                                        ]
+                                        .map(
+                                          (shelf) => DropdownMenuItem(
+                                            value: shelf,
+                                            child: Text(shelf),
+                                          ),
+                                        )
+                                        .toList(),
+                                onChanged: (val) {
+                                  if (val != null) {
+                                    setState(() {
+                                      _selectedShelf = val;
+                                    });
+                                  }
+                                },
+                              ),
+                              const SizedBox(height: 24),
+
+                              // Currently Reading Progress Fields
+                              if (_selectedShelf == 'Currently Reading') ...[
+                                const Text(
+                                  'Reading Progress',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF3A3142),
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: TextFormField(
+                                        controller: _currentPageController,
+                                        style: const TextStyle(
+                                          color: Color(0xFF3A3142),
+                                        ),
+                                        keyboardType: TextInputType.number,
+                                        decoration: _buildInputDecoration(
+                                          'Current Page',
+                                          Icons.find_in_page_outlined,
+                                        ),
+                                        validator: (value) {
+                                          if (value == null ||
+                                              value.trim().isEmpty) {
+                                            return 'Required';
+                                          }
+                                          final val = int.tryParse(
+                                            value.trim(),
+                                          );
+                                          if (val == null || val < 0) {
+                                            return 'Invalid';
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Expanded(
+                                      child: TextFormField(
+                                        controller: _totalPagesController,
+                                        style: const TextStyle(
+                                          color: Color(0xFF3A3142),
+                                        ),
+                                        keyboardType: TextInputType.number,
+                                        decoration: _buildInputDecoration(
+                                          'Total Pages',
+                                          Icons.library_books_outlined,
+                                        ),
+                                        validator: (value) {
+                                          if (value == null ||
+                                              value.trim().isEmpty) {
+                                            return 'Required';
+                                          }
+                                          final val = int.tryParse(
+                                            value.trim(),
+                                          );
+                                          if (val == null || val < 0) {
+                                            return 'Invalid';
+                                          }
+                                          final currVal = int.tryParse(
+                                            _currentPageController.text,
+                                          );
+                                          if (currVal != null &&
+                                              val < currVal) {
+                                            return 'Must be >= Current';
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 16),
+                              ],
+
+                              // Finished Reading Reviews/Ratings Fields
+                              if (_selectedShelf == 'Finished Reading') ...[
+                                const Text(
+                                  'Review Details',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF3A3142),
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                // Completion Date
+                                TextFormField(
+                                  controller: _completionDateController,
+                                  style: const TextStyle(
+                                    color: Color(0xFF3A3142),
+                                  ),
+                                  readOnly: true,
+                                  onTap: _selectCompletionDate,
+                                  decoration: _buildInputDecoration(
+                                    'Completion Date',
+                                    Icons.date_range_outlined,
+                                  ),
+                                  validator: (value) =>
+                                      value == null || value.isEmpty
+                                      ? 'Completion date is required'
+                                      : null,
+                                ),
+                                const SizedBox(height: 16),
+
+                                // Star Rating Selector
+                                DropdownButtonFormField<int>(
+                                  value: _selectedRating,
+                                  style: const TextStyle(
+                                    color: Color(0xFF3A3142),
+                                  ),
+                                  dropdownColor: const Color(0xFFFFFFFF),
+                                  decoration: _buildInputDecoration(
+                                    'Rating',
+                                    Icons.star_border,
+                                  ),
+                                  items: [5, 4, 3, 2, 1]
+                                      .map(
+                                        (stars) => DropdownMenuItem(
+                                          value: stars,
+                                          child: Text('$stars Stars'),
+                                        ),
+                                      )
+                                      .toList(),
+                                  onChanged: (val) {
+                                    if (val != null) {
+                                      setState(() {
+                                        _selectedRating = val;
+                                      });
+                                    }
+                                  },
+                                ),
+                                const SizedBox(height: 16),
+
+                                // Review Text
+                                TextFormField(
+                                  controller: _reviewController,
+                                  style: const TextStyle(
+                                    color: Color(0xFF3A3142),
+                                  ),
+                                  maxLines: 4,
+                                  decoration: _buildInputDecoration(
+                                    'Write a Review (Optional)',
+                                    Icons.rate_review_outlined,
+                                  ),
+                                  validator: (value) {
+                                    if (value != null && value.length > 2000) {
+                                      return 'Review cannot exceed 2000 characters';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                const SizedBox(height: 16),
+                              ],
+                            ],
                           ),
                         ),
-                        child: ElevatedButton(
-                          onPressed: isLoading ? null : _submitForm,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.transparent,
-                            shadowColor: Colors.transparent,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
+                        const SizedBox(height: 32),
+
+                        // Submit Button
+                        Container(
+                          height: 56,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(28),
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFFE78FB3), Color(0xFFF8BBD9)],
                             ),
                           ),
-                          child: Text(
-                            _isEditMode ? 'Update Book' : 'Save Book',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF4A2B33),
+                          child: ElevatedButton(
+                            onPressed: isLoading ? null : _submitForm,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.transparent,
+                              shadowColor: Colors.transparent,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(28),
+                              ),
+                            ),
+                            child: Text(
+                              _isEditMode ? 'Update Book' : 'Save Book',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
+        ),
       ),
     );
   }
 
   Widget _buildCoverPlaceholder() {
-    return const Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(
-          Icons.add_photo_alternate_outlined,
-          size: 48,
-          color: Color(0xFF9A6A73),
-        ),
-        SizedBox(height: 8),
-        Text(
-          'Upload Cover',
-          style: TextStyle(color: Color(0xFF9A6A73), fontSize: 12),
-        ),
-      ],
+    final title = _titleController.text.trim();
+    final author = _authorController.text.trim();
+    if (title.isEmpty && author.isEmpty) {
+      return const Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.add_photo_alternate_outlined,
+            size: 48,
+            color: Color(0xFF8B7E95),
+          ),
+          SizedBox(height: 8),
+          Text(
+            'Upload Cover',
+            style: TextStyle(color: Color(0xFF8B7E95), fontSize: 12),
+          ),
+        ],
+      );
+    }
+    return BookCoverWidget(
+      title: title.isNotEmpty ? title : 'Book Title',
+      author: author.isNotEmpty ? author : 'Author Name',
+      fontSizeMultiplier: 1.15,
     );
   }
 
   InputDecoration _buildInputDecoration(String label, IconData icon) {
     return InputDecoration(
       labelText: label,
-      labelStyle: const TextStyle(color: Color(0xFF9A6A73)),
-      prefixIcon: Icon(icon, color: const Color(0xFF9A6A73)),
+      labelStyle: const TextStyle(color: Color(0xFF8B7E95)),
+      prefixIcon: Icon(icon, color: const Color(0xFF8B7E95)),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: const BorderSide(color: Color(0xFFFFD6CC)),
+        borderSide: const BorderSide(color: Color(0xFFFFDCE8)),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: const BorderSide(color: Color(0xFFFF6F91), width: 1.5),
+        borderSide: const BorderSide(color: Color(0xFFE78FB3), width: 1.5),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: const BorderSide(color: Color(0xFFE85D75)),
+        borderSide: const BorderSide(color: Color(0xFFE57373)),
       ),
       focusedErrorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: const BorderSide(color: Color(0xFFE85D75), width: 1.5),
+        borderSide: const BorderSide(color: Color(0xFFE57373), width: 1.5),
       ),
     );
   }
